@@ -17,6 +17,7 @@ void main() {
     final taskListRepo = TaskListRepository();
     final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
     final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
+    final editTaskUseCase = EditTaskUseCase(taskRepo);
     final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
     final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
 
@@ -28,6 +29,7 @@ void main() {
       taskListRepository: taskListRepo,
       createTaskUseCase: createTaskUseCase,
       deleteTaskUseCase: deleteTaskUseCase,
+      editTaskUseCase: editTaskUseCase,
       hydrateUseCase: hydrateUseCase,
       toggleStatusUseCase: toggleStatusUseCase,
     );

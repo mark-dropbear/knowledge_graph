@@ -12,16 +12,19 @@ class TaskListsViewModel extends ChangeNotifier {
   final TaskListRepository _taskListRepository;
   final CreateTaskListUseCase _createTaskListUseCase;
   final DeleteTaskListUseCase _deleteTaskListUseCase;
+  final EditTaskListUseCase _editTaskListUseCase;
   final ExportDatasetUseCase _exportDatasetUseCase;
 
   TaskListsViewModel({
     required TaskListRepository taskListRepository,
     required CreateTaskListUseCase createTaskListUseCase,
     required DeleteTaskListUseCase deleteTaskListUseCase,
+    required EditTaskListUseCase editTaskListUseCase,
     required ExportDatasetUseCase exportDatasetUseCase,
   }) : _taskListRepository = taskListRepository,
        _createTaskListUseCase = createTaskListUseCase,
        _deleteTaskListUseCase = deleteTaskListUseCase,
+       _editTaskListUseCase = editTaskListUseCase,
        _exportDatasetUseCase = exportDatasetUseCase;
 
   bool _isLoading = false;
@@ -70,6 +73,24 @@ class TaskListsViewModel extends ChangeNotifier {
 
     try {
       await _deleteTaskListUseCase.execute(list);
+      _lists = await _taskListRepository.getItems(
+        details: RequestDetails.read(requestType: RequestType.allLocal),
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> editList(TaskList list, String newName, {String? newDescription}) async {
+    if (newName.isEmpty) return;
+
+    _log.info('Editing TaskList: ${list.id}');
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _editTaskListUseCase.execute(list, newName, newDescription: newDescription);
       _lists = await _taskListRepository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );

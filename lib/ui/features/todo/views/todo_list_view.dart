@@ -93,6 +93,82 @@ class _TodoListViewState extends State<TodoListView> {
     );
   }
 
+  void _showEditTaskModal(BuildContext context, Task task) {
+    final nameController = TextEditingController(text: task.name);
+    final descriptionController = TextEditingController(text: task.description);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Edit Task', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: 'Task Name',
+                  border: OutlineInputBorder(),
+                ),
+                autofocus: true,
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description (Optional)',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                    onPressed: () {
+                      widget.viewModel.deleteTask(task);
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Delete'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      final name = nameController.text.trim();
+                      if (name.isNotEmpty) {
+                        widget.viewModel.editTask(
+                          task,
+                          name,
+                          newDescription: descriptionController.text.trim().isEmpty 
+                              ? null 
+                              : descriptionController.text.trim(),
+                        );
+                        Navigator.pop(context);
+                      }
+                    },
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
@@ -150,6 +226,7 @@ class _TodoListViewState extends State<TodoListView> {
                           ),
                         ),
                         subtitle: task.description != null ? Text(task.description!) : null,
+                        onTap: () => _showEditTaskModal(context, task),
                       ),
                     );
                   },

@@ -12,6 +12,7 @@ class TodoListViewModel extends ChangeNotifier {
   final TaskListRepository _taskListRepository;
   final CreateTaskUseCase _createTaskUseCase;
   final DeleteTaskUseCase _deleteTaskUseCase;
+  final EditTaskUseCase _editTaskUseCase;
   final HydrateTaskListUseCase _hydrateUseCase;
   final ToggleTaskStatusUseCase _toggleStatusUseCase;
 
@@ -19,11 +20,13 @@ class TodoListViewModel extends ChangeNotifier {
     required TaskListRepository taskListRepository,
     required CreateTaskUseCase createTaskUseCase,
     required DeleteTaskUseCase deleteTaskUseCase,
+    required EditTaskUseCase editTaskUseCase,
     required HydrateTaskListUseCase hydrateUseCase,
     required ToggleTaskStatusUseCase toggleStatusUseCase,
   }) : _taskListRepository = taskListRepository,
        _createTaskUseCase = createTaskUseCase,
        _deleteTaskUseCase = deleteTaskUseCase,
+       _editTaskUseCase = editTaskUseCase,
        _hydrateUseCase = hydrateUseCase,
        _toggleStatusUseCase = toggleStatusUseCase;
 
@@ -110,5 +113,20 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> editTask(Task task, String newName, {String? newDescription}) async {
+    if (newName.isEmpty) return;
+
+    _log.info('Editing task: ${task.id}');
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _editTaskUseCase.execute(task, newName, newDescription: newDescription);
+      await _hydrateTasks();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
 }

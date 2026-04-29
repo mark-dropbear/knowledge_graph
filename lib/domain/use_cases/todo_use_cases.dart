@@ -154,3 +154,39 @@ class DeleteTaskListUseCase {
     _log.fine('TaskList deleted from repository: ${list.id}');
   }
 }
+
+class EditTaskListUseCase {
+  static final _log = Logger('EditTaskListUseCase');
+
+  final TaskListRepository _taskListRepository;
+
+  EditTaskListUseCase(this._taskListRepository);
+
+  Future<void> execute(TaskList list, String newName, {String? newDescription}) async {
+    final updatedList = list.copyWith(
+      name: newName,
+      description: newDescription,
+    );
+
+    await _taskListRepository.setItem(updatedList);
+    _log.fine('TaskList updated successfully in repository: ${updatedList.id}');
+  }
+}
+
+class EditTaskUseCase {
+  static final _log = Logger('EditTaskUseCase');
+
+  final TaskRepository _taskRepository;
+
+  EditTaskUseCase(this._taskRepository);
+
+  Future<void> execute(Task task, String newName, {String? newDescription}) async {
+    final updatedTask = task.copyWith(
+      name: newName,
+      description: newDescription,
+    );
+
+    await _taskRepository.setItem(updatedTask);
+    _log.fine('Task updated successfully in repository: ${updatedTask.id}');
+  }
+}

@@ -109,5 +109,37 @@ void main() {
       expect(hydrated[0].id, 'task-1'); // Correctly ordered by position
       expect(hydrated[1].id, 'task-2');
     });
+
+    test('EditTaskListUseCase updates name and description', () async {
+      final useCase = EditTaskListUseCase(mockTaskListRepo);
+      final list = TaskList(id: 'list-1', name: 'Old Name');
+
+      await useCase.execute(list, 'New Name', newDescription: 'New Desc');
+
+      final listCapture = verify(mockTaskListRepo.setItem(captureAny)).captured;
+      final updatedList = listCapture.first as TaskList;
+
+      expect(updatedList.name, 'New Name');
+      expect(updatedList.description, 'New Desc');
+      expect(updatedList.id, 'list-1');
+    });
+
+    test('EditTaskUseCase updates name and description', () async {
+      final useCase = EditTaskUseCase(mockTaskRepo);
+      final task = Task(
+        id: 'task-1',
+        name: 'Old Name',
+        actionStatus: TaskStatus.potential,
+      );
+
+      await useCase.execute(task, 'New Name', newDescription: 'New Desc');
+
+      final taskCapture = verify(mockTaskRepo.setItem(captureAny)).captured;
+      final updatedTask = taskCapture.first as Task;
+
+      expect(updatedTask.name, 'New Name');
+      expect(updatedTask.description, 'New Desc');
+      expect(updatedTask.id, 'task-1');
+    });
   });
 }

@@ -35,10 +35,12 @@ void main() {
   // 2. Initialize Use Cases
   final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
   final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
+  final editTaskUseCase = EditTaskUseCase(taskRepo);
   final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
   final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
   final createTaskListUseCase = CreateTaskListUseCase(taskListRepo);
   final deleteTaskListUseCase = DeleteTaskListUseCase(taskListRepo, taskRepo);
+  final editTaskListUseCase = EditTaskListUseCase(taskListRepo);
   final exportDatasetUseCase = ExportDatasetUseCase(taskListRepo, taskRepo);
 
   // 3. Initialize ViewModels (Singletons)
@@ -46,6 +48,7 @@ void main() {
     taskListRepository: taskListRepo,
     createTaskListUseCase: createTaskListUseCase,
     deleteTaskListUseCase: deleteTaskListUseCase,
+    editTaskListUseCase: editTaskListUseCase,
     exportDatasetUseCase: exportDatasetUseCase,
   );
 
@@ -53,6 +56,7 @@ void main() {
     taskListRepository: taskListRepo,
     createTaskUseCase: createTaskUseCase,
     deleteTaskUseCase: deleteTaskUseCase,
+    editTaskUseCase: editTaskUseCase,
     hydrateUseCase: hydrateUseCase,
     toggleStatusUseCase: toggleStatusUseCase,
   );
