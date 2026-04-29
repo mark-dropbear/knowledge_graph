@@ -31,9 +31,7 @@ void main() {
         id: 'urn:uuid:test-list',
         name: 'My Tasks',
         numberOfItems: 1,
-        itemListElement: [
-          ListItem(position: 1, item: 'urn:uuid:test-task')
-        ],
+        itemListElement: [ListItem(position: 1, item: 'urn:uuid:test-task')],
       );
 
       await repository.setItem(taskList);

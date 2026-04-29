@@ -3,10 +3,7 @@ class ListItem {
   final int position;
   final String item; // The @id reference to a Task
 
-  ListItem({
-    required this.position,
-    required this.item,
-  });
+  ListItem({required this.position, required this.item});
 
   factory ListItem.fromJson(Map<String, dynamic> json) {
     // Handle the case where the JSON-LD example had the item inline vs just the ID.
@@ -19,10 +16,7 @@ class ListItem {
       itemId = json['item'] as String;
     }
 
-    return ListItem(
-      position: json['position'] as int,
-      item: itemId,
-    );
+    return ListItem(position: json['position'] as int, item: itemId);
   }
 
   Map<String, dynamic> toJson() {

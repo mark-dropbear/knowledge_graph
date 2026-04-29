@@ -8,10 +8,7 @@ import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 
-@GenerateNiceMocks([
-  MockSpec<TaskRepository>(),
-  MockSpec<TaskListRepository>(),
-])
+@GenerateNiceMocks([MockSpec<TaskRepository>(), MockSpec<TaskListRepository>()])
 import 'todo_use_cases_test.mocks.dart';
 
 void main() {
@@ -37,20 +34,23 @@ void main() {
 
       // Verify task was saved
       verify(mockTaskRepo.setItem(any)).called(1);
-      
+
       // Verify list was updated
       final listCapture = verify(mockTaskListRepo.setItem(captureAny)).captured;
       final updatedList = listCapture.first as TaskList;
-      
+
       expect(updatedList.itemListElement.length, 1);
-      expect(updatedList.itemListElement.first.item.startsWith('urn:uuid:'), isTrue);
+      expect(
+        updatedList.itemListElement.first.item.startsWith('urn:uuid:'),
+        isTrue,
+      );
       expect(updatedList.numberOfItems, 1);
     });
 
     test('DeleteTaskUseCase removes task and updates list positions', () async {
       final useCase = DeleteTaskUseCase(mockTaskRepo, mockTaskListRepo);
       final initialList = TaskList(
-        id: 'list-1', 
+        id: 'list-1',
         name: 'My List',
         numberOfItems: 3,
         itemListElement: [
@@ -68,7 +68,7 @@ void main() {
       // Verify list was updated
       final listCapture = verify(mockTaskListRepo.setItem(captureAny)).captured;
       final updatedList = listCapture.first as TaskList;
-      
+
       expect(updatedList.itemListElement.length, 2);
       expect(updatedList.itemListElement[0].item, 'task-1');
       expect(updatedList.itemListElement[0].position, 1);
@@ -79,7 +79,7 @@ void main() {
     test('HydrateTaskListUseCase resolves tasks in correct order', () async {
       final useCase = HydrateTaskListUseCase(mockTaskRepo);
       final list = TaskList(
-        id: 'list-1', 
+        id: 'list-1',
         name: 'My List',
         itemListElement: [
           ListItem(position: 2, item: 'task-2'),
@@ -87,10 +87,20 @@ void main() {
         ],
       );
 
-      final task1 = Task(id: 'task-1', name: 'Task 1', actionStatus: TaskStatus.potential);
-      final task2 = Task(id: 'task-2', name: 'Task 2', actionStatus: TaskStatus.potential);
+      final task1 = Task(
+        id: 'task-1',
+        name: 'Task 1',
+        actionStatus: TaskStatus.potential,
+      );
+      final task2 = Task(
+        id: 'task-2',
+        name: 'Task 2',
+        actionStatus: TaskStatus.potential,
+      );
 
-      when(mockTaskRepo.getByIds(any)).thenAnswer((_) async => ([task1, task2], <String>{}));
+      when(
+        mockTaskRepo.getByIds(any),
+      ).thenAnswer((_) async => ([task1, task2], <String>{}));
 
       final hydrated = await useCase.execute(list);
 

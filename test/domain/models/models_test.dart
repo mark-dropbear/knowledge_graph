@@ -32,10 +32,7 @@ void main() {
     });
 
     test('ListItem serialization with reference', () {
-      final listItem = ListItem(
-        position: 1,
-        item: 'urn:uuid:test-task',
-      );
+      final listItem = ListItem(position: 1, item: 'urn:uuid:test-task');
 
       final json = listItem.toJson();
       expect(json['@type'], 'ListItem');
@@ -54,8 +51,8 @@ void main() {
         'item': {
           '@type': 'Action',
           '@id': 'urn:uuid:inline-task',
-          'name': 'Inline task'
-        }
+          'name': 'Inline task',
+        },
       };
 
       final deserialized = ListItem.fromJson(json);
@@ -68,9 +65,7 @@ void main() {
         id: 'urn:uuid:test-list',
         name: 'My Tasks',
         numberOfItems: 1,
-        itemListElement: [
-          ListItem(position: 1, item: 'urn:uuid:task-1')
-        ],
+        itemListElement: [ListItem(position: 1, item: 'urn:uuid:task-1')],
       );
 
       final json = taskList.toJson();

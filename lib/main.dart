@@ -4,6 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
+import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 
@@ -11,7 +12,9 @@ void _setupLogging() {
   Logger.root.level = Level.ALL;
   Logger.root.onRecord.listen((record) {
     if (kDebugMode) {
-      print('${record.level.name}: ${record.time}: [${record.loggerName}] ${record.message}');
+      print(
+        '${record.level.name}: ${record.time}: [${record.loggerName}] ${record.message}',
+      );
     }
   });
 }
@@ -28,6 +31,7 @@ void main() {
   final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
   final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
   final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
+  final exportDatasetUseCase = ExportDatasetUseCase(taskListRepo, taskRepo);
 
   // 3. Initialize ViewModel
   final viewModel = TodoListViewModel(
@@ -36,6 +40,7 @@ void main() {
     deleteTaskUseCase: deleteTaskUseCase,
     hydrateUseCase: hydrateUseCase,
     toggleStatusUseCase: toggleStatusUseCase,
+    exportDatasetUseCase: exportDatasetUseCase,
   );
 
   runApp(MainApp(viewModel: viewModel));
@@ -50,10 +55,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorSchemeSeed: Colors.blue,
-        useMaterial3: true,
-      ),
+      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
       home: TodoListView(viewModel: viewModel),
     );
   }

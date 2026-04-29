@@ -1,10 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
+import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 
 class TodoListViewModel extends ChangeNotifier {
   static final _log = Logger('TodoListViewModel');
@@ -14,6 +14,7 @@ class TodoListViewModel extends ChangeNotifier {
   final DeleteTaskUseCase _deleteTaskUseCase;
   final HydrateTaskListUseCase _hydrateUseCase;
   final ToggleTaskStatusUseCase _toggleStatusUseCase;
+  final ExportDatasetUseCase _exportDatasetUseCase;
 
   TodoListViewModel({
     required TaskListRepository taskListRepository,
@@ -21,11 +22,13 @@ class TodoListViewModel extends ChangeNotifier {
     required DeleteTaskUseCase deleteTaskUseCase,
     required HydrateTaskListUseCase hydrateUseCase,
     required ToggleTaskStatusUseCase toggleStatusUseCase,
-  })  : _taskListRepository = taskListRepository,
-        _createTaskUseCase = createTaskUseCase,
-        _deleteTaskUseCase = deleteTaskUseCase,
-        _hydrateUseCase = hydrateUseCase,
-        _toggleStatusUseCase = toggleStatusUseCase;
+    required ExportDatasetUseCase exportDatasetUseCase,
+  }) : _taskListRepository = taskListRepository,
+       _createTaskUseCase = createTaskUseCase,
+       _deleteTaskUseCase = deleteTaskUseCase,
+       _hydrateUseCase = hydrateUseCase,
+       _toggleStatusUseCase = toggleStatusUseCase,
+       _exportDatasetUseCase = exportDatasetUseCase;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -114,8 +117,8 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  String exportJsonLd() {
-    if (_currentList == null) return '';
-    return const JsonEncoder.withIndent('  ').convert(_currentList!.toJson());
+  Future<String> exportJsonLd() async {
+    _log.info('Exporting dataset');
+    return await _exportDatasetUseCase.execute();
   }
 }

@@ -26,10 +26,7 @@ class CreateTaskUseCase {
 
     // 2. Append reference to TaskList
     final items = List<ListItem>.from(list.itemListElement);
-    items.add(ListItem(
-      position: items.length + 1,
-      item: savedTask!.id,
-    ));
+    items.add(ListItem(position: items.length + 1, item: savedTask!.id));
 
     final updatedList = list.copyWith(
       itemListElement: items,
@@ -54,7 +51,7 @@ class DeleteTaskUseCase {
     // 1. Remove from TaskList and recompute positions
     final items = List<ListItem>.from(list.itemListElement)
       ..removeWhere((e) => e.item == taskId);
-    
+
     for (int i = 0; i < items.length; i++) {
       items[i] = ListItem(position: i + 1, item: items[i].item);
     }
@@ -84,7 +81,7 @@ class HydrateTaskListUseCase {
   Future<List<Task>> execute(TaskList list) async {
     final sortedItems = List<ListItem>.from(list.itemListElement)
       ..sort((a, b) => a.position.compareTo(b.position));
-    
+
     final taskIds = sortedItems.map((e) => e.item).toSet();
     if (taskIds.isEmpty) return [];
 
@@ -92,10 +89,7 @@ class HydrateTaskListUseCase {
     final tasks = await _taskRepository.getByIds(taskIds);
     final taskMap = {for (var task in tasks.$1) task.id: task};
 
-    return sortedItems
-        .map((e) => taskMap[e.item])
-        .whereType<Task>()
-        .toList();
+    return sortedItems.map((e) => taskMap[e.item]).whereType<Task>().toList();
   }
 }
 
@@ -113,8 +107,8 @@ class ToggleTaskStatusUseCase {
 
     final updatedTask = task.copyWith(
       actionStatus: newStatus,
-      endTime: newStatus == TaskStatus.completed 
-          ? DateTime.now().toUtc().toIso8601String() 
+      endTime: newStatus == TaskStatus.completed
+          ? DateTime.now().toUtc().toIso8601String()
           : null,
     );
 

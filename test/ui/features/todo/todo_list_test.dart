@@ -3,11 +3,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
+import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 
 void main() {
-  testWidgets('TodoListView add, toggle, and remove task', (WidgetTester tester) async {
+  testWidgets('TodoListView add, toggle, and remove task', (
+    WidgetTester tester,
+  ) async {
     // 1. Initialize real Repositories and UseCases for an integrated widget test
     final taskRepo = TaskRepository();
     final taskListRepo = TaskListRepository();
@@ -15,6 +18,7 @@ void main() {
     final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
     final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
     final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
+    final exportDatasetUseCase = ExportDatasetUseCase(taskListRepo, taskRepo);
 
     final viewModel = TodoListViewModel(
       taskListRepository: taskListRepo,
@@ -22,12 +26,13 @@ void main() {
       deleteTaskUseCase: deleteTaskUseCase,
       hydrateUseCase: hydrateUseCase,
       toggleStatusUseCase: toggleStatusUseCase,
+      exportDatasetUseCase: exportDatasetUseCase,
     );
 
     // 2. Build the widget
-    await tester.pumpWidget(MaterialApp(
-      home: TodoListView(viewModel: viewModel),
-    ));
+    await tester.pumpWidget(
+      MaterialApp(home: TodoListView(viewModel: viewModel)),
+    );
 
     // Allow initial data to load (creates default list)
     await tester.pumpAndSettle();

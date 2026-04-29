@@ -40,12 +40,16 @@ class _TodoListViewState extends State<TodoListView> {
                 IconButton(
                   icon: const Icon(Icons.copy),
                   tooltip: 'Export JSON-LD',
-                  onPressed: () {
-                    final jsonString = widget.viewModel.exportJsonLd();
+                  onPressed: () async {
+                    final jsonString = await widget.viewModel.exportJsonLd();
                     Clipboard.setData(ClipboardData(text: jsonString));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('JSON-LD copied to clipboard')),
-                    );
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('JSON-LD copied to clipboard'),
+                        ),
+                      );
+                    }
                   },
                 ),
             ],
@@ -78,7 +82,7 @@ class _TodoListViewState extends State<TodoListView> {
                               widget.viewModel.addTask(_controller.text);
                               _controller.clear();
                             },
-                          )
+                          ),
                         ],
                       ),
                     ),
@@ -87,7 +91,8 @@ class _TodoListViewState extends State<TodoListView> {
                         itemCount: widget.viewModel.tasks.length,
                         itemBuilder: (context, index) {
                           final task = widget.viewModel.tasks[index];
-                          final isCompleted = task.actionStatus == TaskStatus.completed;
+                          final isCompleted =
+                              task.actionStatus == TaskStatus.completed;
 
                           return Dismissible(
                             key: Key(task.id),
@@ -96,7 +101,10 @@ class _TodoListViewState extends State<TodoListView> {
                               color: Colors.red,
                               alignment: Alignment.centerRight,
                               padding: const EdgeInsets.only(right: 16),
-                              child: const Icon(Icons.delete, color: Colors.white),
+                              child: const Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
                             ),
                             onDismissed: (_) {
                               widget.viewModel.deleteTask(task);
@@ -104,12 +112,15 @@ class _TodoListViewState extends State<TodoListView> {
                             child: ListTile(
                               leading: Checkbox(
                                 value: isCompleted,
-                                onChanged: (_) => widget.viewModel.toggleTask(task),
+                                onChanged: (_) =>
+                                    widget.viewModel.toggleTask(task),
                               ),
                               title: Text(
                                 task.name,
                                 style: TextStyle(
-                                  decoration: isCompleted ? TextDecoration.lineThrough : null,
+                                  decoration: isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
                                 ),
                               ),
                             ),
