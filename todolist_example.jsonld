@@ -1,0 +1,99 @@
+[
+  {
+    "@type": "ItemList",
+    "@id": "urn:uuid:example-uuid-2",
+    "name": "Misc Tasks",
+    "description": "An example of a task list",
+    "numberOfItems": 3,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "Action",
+          "@id": "urn:uuid:example-uuid-3",
+          "name": "Do the dishes",
+          "description": "An example of a task that has already been completed",
+          "actionStatus": "https://schema.org/CompletedActionStatus",
+          "endTime": "2026-04-18T11:12:42Z"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "Action",
+          "@id": "urn:uuid:example-uuid-4",
+          "name": "Walk the dog",
+          "description": "An example of a task that has not yet been completed",
+          "actionStatus": "https://schema.org/PotentialActionStatus"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "item": {
+          "@type": "ItemList",
+          "@id": "urn:uuid:example-uuid-5",
+          "name": "Organize birthday dinner",
+          "description": "An example of a multi-step task that re-uses the same ListItem / Item List vocabulary for data modelling",
+          "numberOfItems": 3,
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "item": {
+                "@type": "Action",
+                "@id": "urn:uuid:example-uuid-6",
+                "name": "Confirm who is able to attend",
+                "description": "Check with Joe, Sally and Andre and check if their partners are coming",
+                "actionStatus": "https://schema.org/CompletedActionStatus",
+                "endTime": "2026-04-18T11:17:04Z"
+              }
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "item": {
+                "@type": "Action",
+                "@id": "urn:uuid:example-uuid-7",
+                "name": "Make the reservation",
+                "description": "Friday night at 7:30PM",
+                "actionStatus": "https://schema.org/PotentialActionStatus"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "@type": "ItemList",
+    "@id": "urn:uuid:example-uuid-8",
+    "name": "Bills to pay",
+    "description": "An example of a task list",
+    "numberOfItems": 3,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "item": {
+          "@type": "Action",
+          "@id": "urn:uuid:example-uuid-9",
+          "name": "Pay electricity bill",
+          "actionStatus": "https://schema.org/PotentialActionStatus"
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "item": {
+          "@type": "Action",
+          "@id": "urn:uuid:example-uuid-10",
+          "name": "Pay Rent",
+          "actionStatus": "https://schema.org/PotentialActionStatus"
+        }
+      }
+    ]
+  }
+]
