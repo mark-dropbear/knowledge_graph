@@ -13,7 +13,7 @@ void main() {
       final task = Task(
         id: 'urn:uuid:test-task',
         name: 'Do dishes',
-        actionStatus: 'https://schema.org/PotentialActionStatus',
+        actionStatus: TaskStatus.potential,
       );
 
       final savedTask = await repository.setItem(task);

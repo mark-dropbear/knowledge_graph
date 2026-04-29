@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 
 class TodoListView extends StatefulWidget {
@@ -86,7 +87,7 @@ class _TodoListViewState extends State<TodoListView> {
                         itemCount: widget.viewModel.tasks.length,
                         itemBuilder: (context, index) {
                           final task = widget.viewModel.tasks[index];
-                          final isCompleted = task.actionStatus == 'https://schema.org/CompletedActionStatus';
+                          final isCompleted = task.actionStatus == TaskStatus.completed;
 
                           return Dismissible(
                             key: Key(task.id),

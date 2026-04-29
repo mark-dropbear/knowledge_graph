@@ -10,7 +10,7 @@ void main() {
         id: 'urn:uuid:test-task',
         name: 'Do dishes',
         description: 'Clean the kitchen',
-        actionStatus: 'https://schema.org/PotentialActionStatus',
+        actionStatus: TaskStatus.potential,
         endTime: '2026-04-18T11:12:42Z',
       );
 

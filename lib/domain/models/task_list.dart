@@ -43,7 +43,8 @@ class TaskList implements Thing {
       name: json['name'] as String,
       description: json['description'] as String?,
       numberOfItems: json['numberOfItems'] as int? ?? 0,
-      itemListElement: (json['itemListElement'] as List<dynamic>?)
+      itemListElement:
+          (json['itemListElement'] as List<dynamic>?)
               ?.map((e) => ListItem.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
@@ -52,6 +53,7 @@ class TaskList implements Thing {
 
   Map<String, dynamic> toJson() {
     return {
+      '@context': 'https://schema.org',
       '@type': type,
       '@id': id,
       'name': name,
@@ -66,6 +68,8 @@ class TaskList implements Thing {
     fromJson: TaskList.fromJson,
     toJson: (list) => list.toJson(),
     getId: (list) => list.id,
-    save: (list) => list.copyWith(id: list.id.isEmpty ? 'urn:uuid:${const Uuid().v4()}' : list.id),
+    save: (list) => list.copyWith(
+      id: list.id.isEmpty ? 'urn:uuid:${const Uuid().v4()}' : list.id,
+    ),
   );
 }

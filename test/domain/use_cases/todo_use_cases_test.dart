@@ -87,8 +87,8 @@ void main() {
         ],
       );
 
-      final task1 = Task(id: 'task-1', name: 'Task 1', actionStatus: '');
-      final task2 = Task(id: 'task-2', name: 'Task 2', actionStatus: '');
+      final task1 = Task(id: 'task-1', name: 'Task 1', actionStatus: TaskStatus.potential);
+      final task2 = Task(id: 'task-2', name: 'Task 2', actionStatus: TaskStatus.potential);
 
       when(mockTaskRepo.getByIds(any)).thenAnswer((_) async => ([task1, task2], <String>{}));
 
