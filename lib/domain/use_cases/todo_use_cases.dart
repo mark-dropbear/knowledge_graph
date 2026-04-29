@@ -19,10 +19,8 @@ class CreateTaskUseCase {
       name: taskName,
       actionStatus: TaskStatus.potential,
     );
-    task = Task.bindings.save(task);
-    _log.fine('Generated new task ID: ${task.id}');
     final savedTask = await _taskRepository.setItem(task);
-    _log.fine('Task saved successfully to repository');
+    _log.fine('Task saved successfully to repository with ID: ${savedTask?.id}');
 
     // 2. Append reference to TaskList
     final items = List<ListItem>.from(list.itemListElement);

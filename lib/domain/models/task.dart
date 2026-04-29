@@ -99,7 +99,7 @@ class Task implements Thing {
   static final bindings = CreationBindings<Task>(
     fromJson: Task.fromJson,
     toJson: (task) => task.toJson(),
-    getId: (task) => task.id,
+    getId: (task) => task.id.isEmpty ? null : task.id,
     save: (task) => task.copyWith(
       id: task.id.isEmpty ? 'urn:uuid:${const Uuid().v4()}' : task.id,
     ),

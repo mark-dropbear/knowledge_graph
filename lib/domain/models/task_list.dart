@@ -67,7 +67,7 @@ class TaskList implements Thing {
   static final bindings = CreationBindings<TaskList>(
     fromJson: TaskList.fromJson,
     toJson: (list) => list.toJson(),
-    getId: (list) => list.id,
+    getId: (list) => list.id.isEmpty ? null : list.id,
     save: (list) => list.copyWith(
       id: list.id.isEmpty ? 'urn:uuid:${const Uuid().v4()}' : list.id,
     ),

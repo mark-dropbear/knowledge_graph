@@ -25,9 +25,10 @@ void main() {
       final useCase = CreateTaskUseCase(mockTaskRepo, mockTaskListRepo);
       final initialList = TaskList(id: 'list-1', name: 'My List');
 
-      // Mock setItem to return the exact task it was given
+      // Mock setItem to simulate data layer ID generation
       when(mockTaskRepo.setItem(any)).thenAnswer((invocation) async {
-        return invocation.positionalArguments[0] as Task;
+        final task = invocation.positionalArguments[0] as Task;
+        return task.id.isEmpty ? task.copyWith(id: 'urn:uuid:mock-1234') : task;
       });
 
       await useCase.execute(initialList, 'New Task');
