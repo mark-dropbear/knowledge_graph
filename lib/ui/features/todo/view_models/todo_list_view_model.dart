@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 
 class TodoListViewModel extends ChangeNotifier {
+  static final _log = Logger('TodoListViewModel');
+
   final TaskListRepository _taskListRepository;
   final CreateTaskUseCase _createTaskUseCase;
   final DeleteTaskUseCase _deleteTaskUseCase;
@@ -34,14 +37,17 @@ class TodoListViewModel extends ChangeNotifier {
   List<Task> get tasks => _tasks;
 
   Future<void> initialize() async {
+    _log.info('Initializing ViewModel');
     _isLoading = true;
     notifyListeners();
 
     try {
       final lists = await _taskListRepository.getItems();
       if (lists.isNotEmpty) {
+        _log.info('Loaded existing TaskList');
         _currentList = lists.first;
       } else {
+        _log.info('No existing TaskList found, creating default');
         _currentList = TaskList(id: 'urn:uuid:default-list', name: 'My Tasks');
         await _taskListRepository.setItem(_currentList!);
       }
@@ -61,6 +67,7 @@ class TodoListViewModel extends ChangeNotifier {
   Future<void> addTask(String name) async {
     if (_currentList == null || name.isEmpty) return;
 
+    _log.info('Adding new task: $name');
     _isLoading = true;
     notifyListeners();
 
@@ -77,6 +84,7 @@ class TodoListViewModel extends ChangeNotifier {
   Future<void> deleteTask(Task task) async {
     if (_currentList == null) return;
 
+    _log.info('Deleting task: ${task.id}');
     _isLoading = true;
     notifyListeners();
 
@@ -93,6 +101,7 @@ class TodoListViewModel extends ChangeNotifier {
   Future<void> toggleTask(Task task) async {
     if (_currentList == null) return;
 
+    _log.info('Toggling task: ${task.id}');
     _isLoading = true;
     notifyListeners();
 

@@ -1,11 +1,24 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 
+void _setupLogging() {
+  Logger.root.level = Level.ALL;
+  Logger.root.onRecord.listen((record) {
+    if (kDebugMode) {
+      print('${record.level.name}: ${record.time}: [${record.loggerName}] ${record.message}');
+    }
+  });
+}
+
 void main() {
+  _setupLogging();
+
   // 1. Initialize Repositories
   final taskRepo = TaskRepository();
   final taskListRepo = TaskListRepository();

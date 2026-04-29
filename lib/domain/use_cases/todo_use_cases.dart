@@ -1,3 +1,4 @@
+import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/list_item.dart';
@@ -5,6 +6,8 @@ import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 
 class CreateTaskUseCase {
+  static final _log = Logger('CreateTaskUseCase');
+
   final TaskRepository _taskRepository;
   final TaskListRepository _taskListRepository;
 
@@ -17,7 +20,9 @@ class CreateTaskUseCase {
       actionStatus: 'https://schema.org/PotentialActionStatus',
     );
     task = Task.bindings.save(task);
+    _log.fine('Generated new task ID: ${task.id}');
     final savedTask = await _taskRepository.setItem(task);
+    _log.fine('Task saved successfully to repository');
 
     // 2. Append reference to TaskList
     final items = List<ListItem>.from(list.itemListElement);
@@ -33,10 +38,13 @@ class CreateTaskUseCase {
 
     // 3. Save updated TaskList
     await _taskListRepository.setItem(updatedList);
+    _log.fine('TaskList updated and saved with new task reference');
   }
 }
 
 class DeleteTaskUseCase {
+  static final _log = Logger('DeleteTaskUseCase');
+
   final TaskRepository _taskRepository;
   final TaskListRepository _taskListRepository;
 
@@ -58,13 +66,17 @@ class DeleteTaskUseCase {
 
     // 2. Save updated TaskList
     await _taskListRepository.setItem(updatedList);
+    _log.fine('TaskList updated and saved without task reference');
 
     // 3. Delete Task from TaskRepository
     await _taskRepository.delete(taskId);
+    _log.fine('Task deleted from repository: $taskId');
   }
 }
 
 class HydrateTaskListUseCase {
+  static final _log = Logger('HydrateTaskListUseCase');
+
   final TaskRepository _taskRepository;
 
   HydrateTaskListUseCase(this._taskRepository);
@@ -76,6 +88,7 @@ class HydrateTaskListUseCase {
     final taskIds = sortedItems.map((e) => e.item).toSet();
     if (taskIds.isEmpty) return [];
 
+    _log.fine('Hydrating ${taskIds.length} tasks for TaskList');
     final tasks = await _taskRepository.getByIds(taskIds);
     final taskMap = {for (var task in tasks.$1) task.id: task};
 
@@ -87,6 +100,8 @@ class HydrateTaskListUseCase {
 }
 
 class ToggleTaskStatusUseCase {
+  static final _log = Logger('ToggleTaskStatusUseCase');
+
   final TaskRepository _taskRepository;
 
   ToggleTaskStatusUseCase(this._taskRepository);
@@ -104,5 +119,6 @@ class ToggleTaskStatusUseCase {
     );
 
     await _taskRepository.setItem(updatedTask);
+    _log.fine('Task status toggled and saved: ${updatedTask.id} -> $newStatus');
   }
 }
