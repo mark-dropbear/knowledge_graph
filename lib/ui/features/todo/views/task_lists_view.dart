@@ -1,38 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:knowledge_graph/domain/models/task.dart';
-import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
+import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 
-class TodoListView extends StatefulWidget {
-  final TodoListViewModel viewModel;
-  final String listId;
+class TaskListsView extends StatefulWidget {
+  final TaskListsViewModel viewModel;
 
-  const TodoListView({
-    super.key, 
-    required this.viewModel,
-    required this.listId,
-  });
+  const TaskListsView({super.key, required this.viewModel});
 
   @override
-  State<TodoListView> createState() => _TodoListViewState();
+  State<TaskListsView> createState() => _TaskListsViewState();
 }
 
-class _TodoListViewState extends State<TodoListView> {
+class _TaskListsViewState extends State<TaskListsView> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.initialize(widget.listId);
+    widget.viewModel.initialize();
   }
 
-  @override
-  void didUpdateWidget(TodoListView oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.listId != widget.listId) {
-      widget.viewModel.initialize(widget.listId);
-    }
-  }
-
-  void _showAddTaskModal(BuildContext context) {
+  void _showAddListModal(BuildContext context) {
     final nameController = TextEditingController();
     final descriptionController = TextEditingController();
 
@@ -50,12 +37,12 @@ class _TodoListViewState extends State<TodoListView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Create New Task', style: Theme.of(context).textTheme.titleLarge),
+              Text('Create New Task List', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  labelText: 'Task Name',
+                  labelText: 'Name',
                   border: OutlineInputBorder(),
                 ),
                 autofocus: true,
@@ -74,7 +61,7 @@ class _TodoListViewState extends State<TodoListView> {
                 onPressed: () {
                   final name = nameController.text.trim();
                   if (name.isNotEmpty) {
-                    widget.viewModel.addTask(
+                    widget.viewModel.addList(
                       name,
                       description: descriptionController.text.trim().isEmpty 
                           ? null 
@@ -83,7 +70,7 @@ class _TodoListViewState extends State<TodoListView> {
                     Navigator.pop(context);
                   }
                 },
-                child: const Text('Add Task'),
+                child: const Text('Create'),
               ),
               const SizedBox(height: 16),
             ],
@@ -100,62 +87,60 @@ class _TodoListViewState extends State<TodoListView> {
       builder: (context, _) {
         return Scaffold(
           appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back),
-              onPressed: () {
-                if (context.canPop()) {
-                  context.pop();
-                } else {
-                  context.go('/');
-                }
-              },
-            ),
-            title: Text(widget.viewModel.currentList?.name ?? 'Loading...'),
+            title: const Text('My Task Lists'),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.copy),
+                tooltip: 'Export JSON-LD',
+                onPressed: () async {
+                  final jsonString = await widget.viewModel.exportJsonLd();
+                  Clipboard.setData(ClipboardData(text: jsonString));
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('JSON-LD copied to clipboard'),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
           ),
-          body: widget.viewModel.isLoading && widget.viewModel.tasks.isEmpty
+          body: widget.viewModel.isLoading && widget.viewModel.lists.isEmpty
               ? const Center(child: CircularProgressIndicator())
               : ListView.builder(
-                  itemCount: widget.viewModel.tasks.length,
+                  itemCount: widget.viewModel.lists.length,
                   itemBuilder: (context, index) {
-                    final task = widget.viewModel.tasks[index];
-                    final isCompleted =
-                        task.actionStatus == TaskStatus.completed;
+                    final list = widget.viewModel.lists[index];
 
                     return Dismissible(
-                      key: Key(task.id),
+                      key: Key(list.id),
                       direction: DismissDirection.endToStart,
                       background: Container(
                         color: Colors.red,
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 16),
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
                       onDismissed: (_) {
-                        widget.viewModel.deleteTask(task);
+                        widget.viewModel.deleteList(list);
                       },
-                      child: ListTile(
-                        leading: Checkbox(
-                          value: isCompleted,
-                          onChanged: (_) => widget.viewModel.toggleTask(task),
+                      child: Card(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        child: ListTile(
+                          title: Text(list.name),
+                          subtitle: list.description != null ? Text(list.description!) : null,
+                          trailing: Text('${list.numberOfItems} items'),
+                          onTap: () {
+                            context.go('/lists/${Uri.encodeComponent(list.id)}');
+                          },
                         ),
-                        title: Text(
-                          task.name,
-                          style: TextStyle(
-                            decoration: isCompleted
-                                ? TextDecoration.lineThrough
-                                : null,
-                          ),
-                        ),
-                        subtitle: task.description != null ? Text(task.description!) : null,
                       ),
                     );
                   },
                 ),
           floatingActionButton: FloatingActionButton(
-            onPressed: () => _showAddTaskModal(context),
+            onPressed: () => _showAddListModal(context),
             child: const Icon(Icons.add),
           ),
         );

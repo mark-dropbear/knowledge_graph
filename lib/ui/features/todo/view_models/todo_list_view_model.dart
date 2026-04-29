@@ -4,7 +4,7 @@ import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
-import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
+
 
 class TodoListViewModel extends ChangeNotifier {
   static final _log = Logger('TodoListViewModel');
@@ -14,7 +14,6 @@ class TodoListViewModel extends ChangeNotifier {
   final DeleteTaskUseCase _deleteTaskUseCase;
   final HydrateTaskListUseCase _hydrateUseCase;
   final ToggleTaskStatusUseCase _toggleStatusUseCase;
-  final ExportDatasetUseCase _exportDatasetUseCase;
 
   TodoListViewModel({
     required TaskListRepository taskListRepository,
@@ -22,13 +21,11 @@ class TodoListViewModel extends ChangeNotifier {
     required DeleteTaskUseCase deleteTaskUseCase,
     required HydrateTaskListUseCase hydrateUseCase,
     required ToggleTaskStatusUseCase toggleStatusUseCase,
-    required ExportDatasetUseCase exportDatasetUseCase,
   }) : _taskListRepository = taskListRepository,
        _createTaskUseCase = createTaskUseCase,
        _deleteTaskUseCase = deleteTaskUseCase,
        _hydrateUseCase = hydrateUseCase,
-       _toggleStatusUseCase = toggleStatusUseCase,
-       _exportDatasetUseCase = exportDatasetUseCase;
+       _toggleStatusUseCase = toggleStatusUseCase;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -39,22 +36,18 @@ class TodoListViewModel extends ChangeNotifier {
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
 
-  Future<void> initialize() async {
-    _log.info('Initializing ViewModel');
+  Future<void> initialize(String listId) async {
+    _log.info('Initializing ViewModel for list: $listId');
     _isLoading = true;
     notifyListeners();
 
     try {
-      final lists = await _taskListRepository.getItems();
-      if (lists.isNotEmpty) {
-        _log.info('Loaded existing TaskList');
-        _currentList = lists.first;
+      _currentList = await _taskListRepository.getById(listId);
+      if (_currentList == null) {
+        _log.warning('TaskList not found: $listId');
       } else {
-        _log.info('No existing TaskList found, creating default');
-        _currentList = TaskList(id: 'urn:uuid:default-list', name: 'My Tasks');
-        await _taskListRepository.setItem(_currentList!);
+        await _hydrateTasks();
       }
-      await _hydrateTasks();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -67,7 +60,7 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addTask(String name) async {
+  Future<void> addTask(String name, {String? description}) async {
     if (_currentList == null || name.isEmpty) return;
 
     _log.info('Adding new task: $name');
@@ -75,7 +68,7 @@ class TodoListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _createTaskUseCase.execute(_currentList!, name);
+      await _createTaskUseCase.execute(_currentList!, name, description: description);
       _currentList = await _taskListRepository.getById(_currentList!.id);
       await _hydrateTasks();
     } finally {
@@ -117,8 +110,5 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<String> exportJsonLd() async {
-    _log.info('Exporting dataset');
-    return await _exportDatasetUseCase.execute();
-  }
+
 }
