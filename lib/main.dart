@@ -13,6 +13,10 @@ import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_mod
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_lists_view.dart';
 import 'package:knowledge_graph/ui/layout/main_layout.dart';
+import 'package:knowledge_graph/data/repositories/person_repository.dart';
+import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
+import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/features/people/views/people_view.dart';
 
 void _setupLogging() {
   Logger.root.level = Level.ALL;
@@ -32,6 +36,7 @@ void main() {
   // 1. Initialize Repositories (Singletons)
   final taskRepo = TaskRepository();
   final taskListRepo = TaskListRepository();
+  final personRepo = PersonRepository();
 
   // 2. Initialize Use Cases
   final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
@@ -42,7 +47,15 @@ void main() {
   final createTaskListUseCase = CreateTaskListUseCase(taskListRepo);
   final deleteTaskListUseCase = DeleteTaskListUseCase(taskListRepo, taskRepo);
   final editTaskListUseCase = EditTaskListUseCase(taskListRepo);
-  final exportDatasetUseCase = ExportDatasetUseCase(taskListRepo, taskRepo);
+  final exportDatasetUseCase = ExportDatasetUseCase(
+    taskListRepo,
+    taskRepo,
+    personRepo,
+  );
+
+  final createPersonUseCase = CreatePersonUseCase(personRepo);
+  final editPersonUseCase = EditPersonUseCase(personRepo);
+  final deletePersonUseCase = DeletePersonUseCase(personRepo);
 
   // 3. Initialize ViewModels (Singletons)
   final taskListsViewModel = TaskListsViewModel(
@@ -60,6 +73,13 @@ void main() {
     editTaskUseCase: editTaskUseCase,
     hydrateUseCase: hydrateUseCase,
     toggleStatusUseCase: toggleStatusUseCase,
+  );
+
+  final peopleViewModel = PeopleViewModel(
+    personRepository: personRepo,
+    createPersonUseCase: createPersonUseCase,
+    editPersonUseCase: editPersonUseCase,
+    deletePersonUseCase: deletePersonUseCase,
   );
 
   // 4. Configure GoRouter
@@ -80,6 +100,10 @@ void main() {
               final listId = state.pathParameters['id']!;
               return TodoListView(listId: listId, viewModel: todoListViewModel);
             },
+          ),
+          GoRoute(
+            path: '/people',
+            builder: (context, state) => PeopleView(viewModel: peopleViewModel),
           ),
         ],
       ),

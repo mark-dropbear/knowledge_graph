@@ -6,16 +6,26 @@ class MainLayout extends StatelessWidget {
 
   const MainLayout({super.key, required this.child});
 
+  int _calculateSelectedIndex(BuildContext context) {
+    final String location = GoRouterState.of(context).uri.path;
+    if (location.startsWith('/people')) {
+      return 1;
+    }
+    return 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Row(
         children: [
           NavigationRail(
-            selectedIndex: 0,
+            selectedIndex: _calculateSelectedIndex(context),
             onDestinationSelected: (int index) {
               if (index == 0) {
                 context.go('/');
+              } else if (index == 1) {
+                context.go('/people');
               }
             },
             labelType: NavigationRailLabelType.all,
@@ -24,6 +34,11 @@ class MainLayout extends StatelessWidget {
                 icon: Icon(Icons.task),
                 selectedIcon: Icon(Icons.task),
                 label: Text('Tasks'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.people),
+                selectedIcon: Icon(Icons.people),
+                label: Text('People'),
               ),
             ],
           ),
