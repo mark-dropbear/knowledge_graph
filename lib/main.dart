@@ -12,6 +12,7 @@ import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_mode
 import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_lists_view.dart';
+import 'package:knowledge_graph/ui/layout/main_layout.dart';
 
 void _setupLogging() {
   Logger.root.level = Level.ALL;
@@ -65,19 +66,24 @@ void main() {
   final router = GoRouter(
     initialLocation: '/',
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => TaskListsView(viewModel: taskListsViewModel),
-      ),
-      GoRoute(
-        path: '/lists/:id',
-        builder: (context, state) {
-          final listId = state.pathParameters['id']!;
-          return TodoListView(
-            listId: listId,
-            viewModel: todoListViewModel,
-          );
-        },
+      ShellRoute(
+        builder: (context, state, child) => MainLayout(child: child),
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => TaskListsView(viewModel: taskListsViewModel),
+          ),
+          GoRoute(
+            path: '/lists/:id',
+            builder: (context, state) {
+              final listId = state.pathParameters['id']!;
+              return TodoListView(
+                listId: listId,
+                viewModel: todoListViewModel,
+              );
+            },
+          ),
+        ],
       ),
     ],
   );
