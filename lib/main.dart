@@ -17,6 +17,10 @@ import 'package:knowledge_graph/data/repositories/person_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 import 'package:knowledge_graph/ui/features/people/views/people_view.dart';
+import 'package:knowledge_graph/data/repositories/organization_repository.dart';
+import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
+import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/features/organizations/views/organizations_view.dart';
 
 void _setupLogging() {
   Logger.root.level = Level.ALL;
@@ -37,6 +41,7 @@ void main() {
   final taskRepo = TaskRepository();
   final taskListRepo = TaskListRepository();
   final personRepo = PersonRepository();
+  final organizationRepo = OrganizationRepository();
 
   // 2. Initialize Use Cases
   final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
@@ -51,11 +56,16 @@ void main() {
     taskListRepo,
     taskRepo,
     personRepo,
+    organizationRepo,
   );
 
   final createPersonUseCase = CreatePersonUseCase(personRepo);
   final editPersonUseCase = EditPersonUseCase(personRepo);
   final deletePersonUseCase = DeletePersonUseCase(personRepo);
+
+  final createOrganizationUseCase = CreateOrganizationUseCase(organizationRepo);
+  final editOrganizationUseCase = EditOrganizationUseCase(organizationRepo);
+  final deleteOrganizationUseCase = DeleteOrganizationUseCase(organizationRepo);
 
   // 3. Initialize ViewModels (Singletons)
   final taskListsViewModel = TaskListsViewModel(
@@ -82,6 +92,13 @@ void main() {
     deletePersonUseCase: deletePersonUseCase,
   );
 
+  final organizationsViewModel = OrganizationsViewModel(
+    organizationRepository: organizationRepo,
+    createOrganizationUseCase: createOrganizationUseCase,
+    editOrganizationUseCase: editOrganizationUseCase,
+    deleteOrganizationUseCase: deleteOrganizationUseCase,
+  );
+
   // 4. Configure GoRouter
   final router = GoRouter(
     initialLocation: '/',
@@ -104,6 +121,11 @@ void main() {
           GoRoute(
             path: '/people',
             builder: (context, state) => PeopleView(viewModel: peopleViewModel),
+          ),
+          GoRoute(
+            path: '/organizations',
+            builder: (context, state) =>
+                OrganizationsView(viewModel: organizationsViewModel),
           ),
         ],
       ),

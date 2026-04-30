@@ -10,6 +10,8 @@ class MainLayout extends StatelessWidget {
     final String location = GoRouterState.of(context).uri.path;
     if (location.startsWith('/people')) {
       return 1;
+    } else if (location.startsWith('/organizations')) {
+      return 2;
     }
     return 0;
   }
@@ -26,6 +28,8 @@ class MainLayout extends StatelessWidget {
                 context.go('/');
               } else if (index == 1) {
                 context.go('/people');
+              } else if (index == 2) {
+                context.go('/organizations');
               }
             },
             labelType: NavigationRailLabelType.all,
@@ -39,6 +43,11 @@ class MainLayout extends StatelessWidget {
                 icon: Icon(Icons.people),
                 selectedIcon: Icon(Icons.people),
                 label: Text('People'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.business),
+                selectedIcon: Icon(Icons.business),
+                label: Text('Orgs'),
               ),
             ],
           ),

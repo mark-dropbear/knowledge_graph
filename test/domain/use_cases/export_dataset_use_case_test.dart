@@ -6,15 +6,18 @@ import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/list_item.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/data/repositories/task_repository.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/data/repositories/person_repository.dart';
+import 'package:knowledge_graph/data/repositories/organization_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 
 @GenerateNiceMocks([
   MockSpec<TaskRepository>(),
   MockSpec<TaskListRepository>(),
   MockSpec<PersonRepository>(),
+  MockSpec<OrganizationRepository>(),
 ])
 import 'export_dataset_use_case_test.mocks.dart';
 
@@ -23,16 +26,19 @@ void main() {
     late MockTaskRepository mockTaskRepo;
     late MockTaskListRepository mockTaskListRepo;
     late MockPersonRepository mockPersonRepo;
+    late MockOrganizationRepository mockOrganizationRepo;
     late ExportDatasetUseCase useCase;
 
     setUp(() {
       mockTaskRepo = MockTaskRepository();
       mockTaskListRepo = MockTaskListRepository();
       mockPersonRepo = MockPersonRepository();
+      mockOrganizationRepo = MockOrganizationRepository();
       useCase = ExportDatasetUseCase(
         mockTaskListRepo,
         mockTaskRepo,
         mockPersonRepo,
+        mockOrganizationRepo,
       );
     });
 
@@ -64,6 +70,12 @@ void main() {
         familyName: 'Doe',
       );
 
+      final organization = Organization(
+        id: 'urn:uuid:o1',
+        name: 'Acme Corp',
+        orgType: OrganizationType.corporation,
+      );
+
       when(
         mockTaskListRepo.getItems(details: anyNamed('details')),
       ).thenAnswer((_) async => [taskList]);
@@ -73,6 +85,9 @@ void main() {
       when(
         mockPersonRepo.getItems(details: anyNamed('details')),
       ).thenAnswer((_) async => [person]);
+      when(
+        mockOrganizationRepo.getItems(details: anyNamed('details')),
+      ).thenAnswer((_) async => [organization]);
 
       final jsonString = await useCase.execute();
       final dataset = jsonDecode(jsonString) as Map<String, dynamic>;
@@ -81,7 +96,7 @@ void main() {
       expect(dataset['@graph'], isA<List>());
 
       final graph = dataset['@graph'] as List;
-      expect(graph.length, 4); // 1 list + 2 tasks + 1 person
+      expect(graph.length, 5); // 1 list + 2 tasks + 1 person + 1 org
 
       final listNode = graph.firstWhere((n) => n['@type'] == 'ItemList');
       expect(listNode['@id'], 'urn:uuid:l1');
@@ -99,6 +114,11 @@ void main() {
       expect(personNode['@type'], 'Person');
       expect(personNode['givenName'], 'John');
       expect(personNode.containsKey('@context'), isFalse);
+
+      final orgNode = graph.firstWhere((n) => n['@id'] == 'urn:uuid:o1');
+      expect(orgNode['@type'], 'Corporation');
+      expect(orgNode['name'], 'Acme Corp');
+      expect(orgNode.containsKey('@context'), isFalse);
     });
   });
 }
