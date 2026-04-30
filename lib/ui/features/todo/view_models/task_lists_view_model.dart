@@ -82,7 +82,11 @@ class TaskListsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> editList(TaskList list, String newName, {String? newDescription}) async {
+  Future<void> editList(
+    TaskList list,
+    String newName, {
+    String? newDescription,
+  }) async {
     if (newName.isEmpty) return;
 
     _log.info('Editing TaskList: ${list.id}');
@@ -90,7 +94,11 @@ class TaskListsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _editTaskListUseCase.execute(list, newName, newDescription: newDescription);
+      await _editTaskListUseCase.execute(
+        list,
+        newName,
+        newDescription: newDescription,
+      );
       _lists = await _taskListRepository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );

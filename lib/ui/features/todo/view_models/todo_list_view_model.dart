@@ -5,7 +5,6 @@ import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 
-
 class TodoListViewModel extends ChangeNotifier {
   static final _log = Logger('TodoListViewModel');
 
@@ -71,7 +70,11 @@ class TodoListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _createTaskUseCase.execute(_currentList!, name, description: description);
+      await _createTaskUseCase.execute(
+        _currentList!,
+        name,
+        description: description,
+      );
       _currentList = await _taskListRepository.getById(_currentList!.id);
       await _hydrateTasks();
     } finally {
@@ -113,7 +116,11 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> editTask(Task task, String newName, {String? newDescription}) async {
+  Future<void> editTask(
+    Task task,
+    String newName, {
+    String? newDescription,
+  }) async {
     if (newName.isEmpty) return;
 
     _log.info('Editing task: ${task.id}');
@@ -121,12 +128,15 @@ class TodoListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _editTaskUseCase.execute(task, newName, newDescription: newDescription);
+      await _editTaskUseCase.execute(
+        task,
+        newName,
+        newDescription: newDescription,
+      );
       await _hydrateTasks();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
-
 }

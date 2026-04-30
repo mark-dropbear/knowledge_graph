@@ -8,7 +8,7 @@ class TodoListView extends StatefulWidget {
   final String listId;
 
   const TodoListView({
-    super.key, 
+    super.key,
     required this.viewModel,
     required this.listId,
   });
@@ -50,7 +50,10 @@ class _TodoListViewState extends State<TodoListView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Create New Task', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Create New Task',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
@@ -76,8 +79,8 @@ class _TodoListViewState extends State<TodoListView> {
                   if (name.isNotEmpty) {
                     widget.viewModel.addTask(
                       name,
-                      description: descriptionController.text.trim().isEmpty 
-                          ? null 
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
                           : descriptionController.text.trim(),
                     );
                     Navigator.pop(context);
@@ -135,7 +138,9 @@ class _TodoListViewState extends State<TodoListView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
                     onPressed: () {
                       widget.viewModel.deleteTask(task);
                       Navigator.pop(context);
@@ -150,8 +155,9 @@ class _TodoListViewState extends State<TodoListView> {
                         widget.viewModel.editTask(
                           task,
                           name,
-                          newDescription: descriptionController.text.trim().isEmpty 
-                              ? null 
+                          newDescription:
+                              descriptionController.text.trim().isEmpty
+                              ? null
                               : descriptionController.text.trim(),
                         );
                         Navigator.pop(context);
@@ -204,10 +210,7 @@ class _TodoListViewState extends State<TodoListView> {
                         color: Colors.red,
                         alignment: Alignment.centerRight,
                         padding: const EdgeInsets.only(right: 16),
-                        child: const Icon(
-                          Icons.delete,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.delete, color: Colors.white),
                       ),
                       onDismissed: (_) {
                         widget.viewModel.deleteTask(task);
@@ -225,7 +228,9 @@ class _TodoListViewState extends State<TodoListView> {
                                 : null,
                           ),
                         ),
-                        subtitle: task.description != null ? Text(task.description!) : null,
+                        subtitle: task.description != null
+                            ? Text(task.description!)
+                            : null,
                         onTap: () => _showEditTaskModal(context, task),
                       ),
                     );

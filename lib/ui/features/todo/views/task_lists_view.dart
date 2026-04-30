@@ -38,7 +38,10 @@ class _TaskListsViewState extends State<TaskListsView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Create New Task List', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Create New Task List',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
@@ -64,8 +67,8 @@ class _TaskListsViewState extends State<TaskListsView> {
                   if (name.isNotEmpty) {
                     widget.viewModel.addList(
                       name,
-                      description: descriptionController.text.trim().isEmpty 
-                          ? null 
+                      description: descriptionController.text.trim().isEmpty
+                          ? null
                           : descriptionController.text.trim(),
                     );
                     Navigator.pop(context);
@@ -99,7 +102,10 @@ class _TaskListsViewState extends State<TaskListsView> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Edit Task List', style: Theme.of(context).textTheme.titleLarge),
+              Text(
+                'Edit Task List',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: nameController,
@@ -123,7 +129,9 @@ class _TaskListsViewState extends State<TaskListsView> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(foregroundColor: Colors.red),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
                     onPressed: () {
                       widget.viewModel.deleteList(list);
                       Navigator.pop(context);
@@ -138,8 +146,9 @@ class _TaskListsViewState extends State<TaskListsView> {
                         widget.viewModel.editList(
                           list,
                           name,
-                          newDescription: descriptionController.text.trim().isEmpty 
-                              ? null 
+                          newDescription:
+                              descriptionController.text.trim().isEmpty
+                              ? null
                               : descriptionController.text.trim(),
                         );
                         Navigator.pop(context);
@@ -203,22 +212,30 @@ class _TaskListsViewState extends State<TaskListsView> {
                         widget.viewModel.deleteList(list);
                       },
                       child: Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        margin: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: ListTile(
                           title: Text(list.name),
-                          subtitle: list.description != null ? Text(list.description!) : null,
+                          subtitle: list.description != null
+                              ? Text(list.description!)
+                              : null,
                           trailing: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text('${list.numberOfItems} items'),
                               IconButton(
                                 icon: const Icon(Icons.edit, size: 20),
-                                onPressed: () => _showEditListModal(context, list),
+                                onPressed: () =>
+                                    _showEditListModal(context, list),
                               ),
                             ],
                           ),
                           onTap: () {
-                            context.go('/lists/${Uri.encodeComponent(list.id)}');
+                            context.go(
+                              '/lists/${Uri.encodeComponent(list.id)}',
+                            );
                           },
                         ),
                       ),

@@ -71,16 +71,14 @@ void main() {
         routes: [
           GoRoute(
             path: '/',
-            builder: (context, state) => TaskListsView(viewModel: taskListsViewModel),
+            builder: (context, state) =>
+                TaskListsView(viewModel: taskListsViewModel),
           ),
           GoRoute(
             path: '/lists/:id',
             builder: (context, state) {
               final listId = state.pathParameters['id']!;
-              return TodoListView(
-                listId: listId,
-                viewModel: todoListViewModel,
-              );
+              return TodoListView(listId: listId, viewModel: todoListViewModel);
             },
           ),
         ],

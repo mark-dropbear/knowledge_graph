@@ -36,7 +36,9 @@ void main() {
 
     // 2. Build the widget
     await tester.pumpWidget(
-      MaterialApp(home: TodoListView(viewModel: viewModel, listId: 'urn:uuid:test-list')),
+      MaterialApp(
+        home: TodoListView(viewModel: viewModel, listId: 'urn:uuid:test-list'),
+      ),
     );
 
     // Allow initial data to load
