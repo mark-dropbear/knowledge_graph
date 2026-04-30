@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:knowledge_graph/domain/models/organization.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
 
 class OrganizationsView extends StatefulWidget {
@@ -16,187 +16,6 @@ class _OrganizationsViewState extends State<OrganizationsView> {
   void initState() {
     super.initState();
     widget.viewModel.initialize();
-  }
-
-  void _showAddOrganizationModal(BuildContext context) {
-    _showOrganizationModal(context);
-  }
-
-  void _showEditOrganizationModal(
-    BuildContext context,
-    Organization organization,
-  ) {
-    _showOrganizationModal(context, organization: organization);
-  }
-
-  void _showOrganizationModal(
-    BuildContext context, {
-    Organization? organization,
-  }) {
-    final nameController = TextEditingController(text: organization?.name);
-    final legalNameController = TextEditingController(
-      text: organization?.legalName,
-    );
-    final descriptionController = TextEditingController(
-      text: organization?.description,
-    );
-    final urlController = TextEditingController(text: organization?.url);
-    OrganizationType selectedType =
-        organization?.orgType ?? OrganizationType.organization;
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            void updateState() {
-              setState(() {});
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 16,
-                right: 16,
-                top: 16,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Text(
-                      organization == null
-                          ? 'Add Organization'
-                          : 'Edit Organization',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 16),
-                    DropdownButtonFormField<OrganizationType>(
-                      initialValue: selectedType,
-                      decoration: const InputDecoration(
-                        labelText: 'Organization Type',
-                        border: OutlineInputBorder(),
-                      ),
-                      items: OrganizationType.values.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(type.toSchemaString()),
-                        );
-                      }).toList(),
-                      onChanged: (value) {
-                        if (value != null) {
-                          setState(() {
-                            selectedType = value;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Name *',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (_) => updateState(),
-                      autofocus: organization == null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: legalNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Legal Name',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: descriptionController,
-                      decoration: const InputDecoration(
-                        labelText: 'Description',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: urlController,
-                      decoration: const InputDecoration(
-                        labelText: 'URL',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (organization != null)
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                            ),
-                            onPressed: () {
-                              widget.viewModel.deleteOrganization(organization);
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Delete'),
-                          )
-                        else
-                          const SizedBox.shrink(),
-                        ElevatedButton(
-                          onPressed: nameController.text.trim().isEmpty
-                              ? null
-                              : () {
-                                  final name = nameController.text.trim();
-                                  final legalName = legalNameController.text
-                                      .trim();
-                                  final description = descriptionController.text
-                                      .trim();
-                                  final url = urlController.text.trim();
-
-                                  if (organization == null) {
-                                    widget.viewModel.addOrganization(
-                                      name: name,
-                                      orgType: selectedType,
-                                      legalName: legalName.isEmpty
-                                          ? null
-                                          : legalName,
-                                      description: description.isEmpty
-                                          ? null
-                                          : description,
-                                      url: url.isEmpty ? null : url,
-                                    );
-                                  } else {
-                                    widget.viewModel.editOrganization(
-                                      organization,
-                                      name: name,
-                                      orgType: selectedType,
-                                      legalName: legalName.isEmpty
-                                          ? null
-                                          : legalName,
-                                      description: description.isEmpty
-                                          ? null
-                                          : description,
-                                      url: url.isEmpty ? null : url,
-                                    );
-                                  }
-                                  Navigator.pop(context);
-                                },
-                          child: const Text('Save'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 
   @override
@@ -238,8 +57,52 @@ class _OrganizationsViewState extends State<OrganizationsView> {
                 child: ListTile(
                   title: Text(organization.name),
                   subtitle: Text(organization.orgType.toSchemaString()),
-                  onTap: () =>
-                      _showEditOrganizationModal(context, organization),
+                  onTap: () => context.go('/organizations/${organization.id}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20),
+                        onPressed: () => context.go(
+                          '/organizations/${organization.id}/edit',
+                        ),
+                        tooltip: 'Edit Organization',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, size: 20),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Organization?'),
+                              content: Text(
+                                'Are you sure you want to delete ${organization.name}?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            widget.viewModel.deleteOrganization(organization);
+                          }
+                        },
+                        tooltip: 'Delete Organization',
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -247,7 +110,7 @@ class _OrganizationsViewState extends State<OrganizationsView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddOrganizationModal(context),
+        onPressed: () => context.go('/organizations/create'),
         child: const Icon(Icons.add),
       ),
     );

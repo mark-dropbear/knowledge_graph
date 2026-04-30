@@ -21,6 +21,10 @@ import 'package:knowledge_graph/data/repositories/organization_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organizations_view.dart';
+import 'package:knowledge_graph/ui/features/people/views/person_form_view.dart';
+import 'package:knowledge_graph/ui/features/people/views/person_detail_view.dart';
+import 'package:knowledge_graph/ui/features/organizations/views/organization_form_view.dart';
+import 'package:knowledge_graph/ui/features/organizations/views/organization_detail_view.dart';
 
 void _setupLogging() {
   Logger.root.level = Level.ALL;
@@ -121,11 +125,69 @@ void main() {
           GoRoute(
             path: '/people',
             builder: (context, state) => PeopleView(viewModel: peopleViewModel),
+            routes: [
+              GoRoute(
+                path: 'create',
+                builder: (context, state) =>
+                    PersonFormView(viewModel: peopleViewModel),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return PersonDetailView(
+                    viewModel: peopleViewModel,
+                    personId: id,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return PersonFormView(
+                        viewModel: peopleViewModel,
+                        personId: id,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: '/organizations',
             builder: (context, state) =>
                 OrganizationsView(viewModel: organizationsViewModel),
+            routes: [
+              GoRoute(
+                path: 'create',
+                builder: (context, state) =>
+                    OrganizationFormView(viewModel: organizationsViewModel),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return OrganizationDetailView(
+                    viewModel: organizationsViewModel,
+                    organizationId: id,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return OrganizationFormView(
+                        viewModel: organizationsViewModel,
+                        organizationId: id,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
         ],
       ),

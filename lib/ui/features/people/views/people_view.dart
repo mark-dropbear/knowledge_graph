@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 
 class PeopleView extends StatefulWidget {
@@ -16,164 +16,6 @@ class _PeopleViewState extends State<PeopleView> {
   void initState() {
     super.initState();
     widget.viewModel.initialize();
-  }
-
-  void _showAddPersonModal(BuildContext context) {
-    _showPersonModal(context);
-  }
-
-  void _showEditPersonModal(BuildContext context, Person person) {
-    _showPersonModal(context, person: person);
-  }
-
-  void _showPersonModal(BuildContext context, {Person? person}) {
-    final givenNameController = TextEditingController(text: person?.givenName);
-    final familyNameController = TextEditingController(
-      text: person?.familyName,
-    );
-    final jobTitleController = TextEditingController(text: person?.jobTitle);
-    final birthDateController = TextEditingController(text: person?.birthDate);
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            void updateState() {
-              setState(() {});
-            }
-
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom,
-                left: 16,
-                right: 16,
-                top: 16,
-              ),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      person == null ? 'Add Person' : 'Edit Person',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: givenNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Given Name',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (_) => updateState(),
-                      autofocus: person == null,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: familyNameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Family Name',
-                        border: OutlineInputBorder(),
-                      ),
-                      onChanged: (_) => updateState(),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: jobTitleController,
-                      decoration: const InputDecoration(
-                        labelText: 'Job Title',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: birthDateController,
-                      decoration: const InputDecoration(
-                        labelText: 'Birth Date (e.g. YYYY-MM-DD)',
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        if (person != null)
-                          OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: Colors.red,
-                            ),
-                            onPressed: () {
-                              widget.viewModel.deletePerson(person);
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.delete),
-                            label: const Text('Delete'),
-                          )
-                        else
-                          const SizedBox.shrink(),
-                        ElevatedButton(
-                          onPressed:
-                              (givenNameController.text.trim().isEmpty &&
-                                  familyNameController.text.trim().isEmpty)
-                              ? null
-                              : () {
-                                  final givenName = givenNameController.text
-                                      .trim();
-                                  final familyName = familyNameController.text
-                                      .trim();
-                                  final jobTitle = jobTitleController.text
-                                      .trim();
-                                  final birthDate = birthDateController.text
-                                      .trim();
-
-                                  if (person == null) {
-                                    widget.viewModel.addPerson(
-                                      givenName: givenName.isEmpty
-                                          ? null
-                                          : givenName,
-                                      familyName: familyName.isEmpty
-                                          ? null
-                                          : familyName,
-                                      jobTitle: jobTitle.isEmpty
-                                          ? null
-                                          : jobTitle,
-                                      birthDate: birthDate.isEmpty
-                                          ? null
-                                          : birthDate,
-                                    );
-                                  } else {
-                                    widget.viewModel.editPerson(
-                                      person,
-                                      givenName: givenName.isEmpty
-                                          ? null
-                                          : givenName,
-                                      familyName: familyName.isEmpty
-                                          ? null
-                                          : familyName,
-                                      jobTitle: jobTitle.isEmpty
-                                          ? null
-                                          : jobTitle,
-                                      birthDate: birthDate.isEmpty
-                                          ? null
-                                          : birthDate,
-                                    );
-                                  }
-                                  Navigator.pop(context);
-                                },
-                          child: const Text('Save'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
   }
 
   @override
@@ -222,7 +64,51 @@ class _PeopleViewState extends State<PeopleView> {
                   subtitle: person.jobTitle != null
                       ? Text(person.jobTitle!)
                       : null,
-                  onTap: () => _showEditPersonModal(context, person),
+                  onTap: () => context.go('/people/${person.id}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.edit, size: 20),
+                        onPressed: () =>
+                            context.go('/people/${person.id}/edit'),
+                        tooltip: 'Edit Person',
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete, size: 20),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Delete Person?'),
+                              content: Text(
+                                'Are you sure you want to delete $displayName?',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () =>
+                                      Navigator.pop(context, false),
+                                  child: const Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context, true),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  child: const Text('Delete'),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          if (confirm == true) {
+                            widget.viewModel.deletePerson(person);
+                          }
+                        },
+                        tooltip: 'Delete Person',
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -230,7 +116,7 @@ class _PeopleViewState extends State<PeopleView> {
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddPersonModal(context),
+        onPressed: () => context.go('/people/create'),
         child: const Icon(Icons.add),
       ),
     );
