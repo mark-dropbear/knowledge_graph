@@ -51,6 +51,7 @@ class TaskList implements Thing {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       '@context': 'https://schema.org',

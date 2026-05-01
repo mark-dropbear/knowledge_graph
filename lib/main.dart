@@ -4,8 +4,7 @@ import 'package:logging/logging.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
-import 'package:knowledge_graph/data/repositories/task_repository.dart';
+import 'package:knowledge_graph/data/repositories/graph_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
@@ -16,11 +15,9 @@ import 'package:knowledge_graph/ui/features/todo/views/task_detail_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_form_view.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/layout/main_layout.dart';
-import 'package:knowledge_graph/data/repositories/person_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 import 'package:knowledge_graph/ui/features/people/views/people_view.dart';
-import 'package:knowledge_graph/data/repositories/organization_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organizations_view.dart';
@@ -45,49 +42,32 @@ void main() {
   usePathUrlStrategy();
 
   // 1. Initialize Repositories (Singletons)
-  final taskRepo = TaskRepository();
-  final taskListRepo = TaskListRepository();
-  final personRepo = PersonRepository();
-  final organizationRepo = OrganizationRepository();
+  final graphRepo = GraphRepository();
 
   // 2. Initialize Use Cases
-  final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
-  final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
-  final editTaskUseCase = EditTaskUseCase(taskRepo);
-  final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
-  final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
-  final createTaskListUseCase = CreateTaskListUseCase(taskListRepo);
-  final deleteTaskListUseCase = DeleteTaskListUseCase(taskListRepo, taskRepo);
-  final editTaskListUseCase = EditTaskListUseCase(taskListRepo);
-  final exportDatasetUseCase = ExportDatasetUseCase(
-    taskListRepo,
-    taskRepo,
-    personRepo,
-    organizationRepo,
-  );
+  final createTaskUseCase = CreateTaskUseCase(graphRepo);
+  final deleteTaskUseCase = DeleteTaskUseCase(graphRepo);
+  final editTaskUseCase = EditTaskUseCase(graphRepo);
+  final hydrateUseCase = HydrateTaskListUseCase(graphRepo);
+  final toggleStatusUseCase = ToggleTaskStatusUseCase(graphRepo);
+  final createTaskListUseCase = CreateTaskListUseCase(graphRepo);
+  final deleteTaskListUseCase = DeleteTaskListUseCase(graphRepo);
+  final editTaskListUseCase = EditTaskListUseCase(graphRepo);
+  final exportDatasetUseCase = ExportDatasetUseCase(graphRepo);
 
-  final createPersonUseCase = CreatePersonUseCase(personRepo, organizationRepo);
-  final editPersonUseCase = EditPersonUseCase(personRepo, organizationRepo);
-  final deletePersonUseCase = DeletePersonUseCase(personRepo, organizationRepo);
+  final createPersonUseCase = CreatePersonUseCase(graphRepo);
+  final editPersonUseCase = EditPersonUseCase(graphRepo);
+  final deletePersonUseCase = DeletePersonUseCase(graphRepo);
 
-  final createOrganizationUseCase = CreateOrganizationUseCase(
-    organizationRepo,
-    personRepo,
-  );
-  final editOrganizationUseCase = EditOrganizationUseCase(
-    organizationRepo,
-    personRepo,
-  );
-  final deleteOrganizationUseCase = DeleteOrganizationUseCase(
-    organizationRepo,
-    personRepo,
-  );
+  final createOrganizationUseCase = CreateOrganizationUseCase(graphRepo);
+  final editOrganizationUseCase = EditOrganizationUseCase(graphRepo);
+  final deleteOrganizationUseCase = DeleteOrganizationUseCase(graphRepo);
 
   // 3. Initialize ViewModels (Singletons)
   final graphViewModel = GraphViewModel();
 
   final taskListsViewModel = TaskListsViewModel(
-    taskListRepository: taskListRepo,
+    repository: graphRepo,
     createTaskListUseCase: createTaskListUseCase,
     deleteTaskListUseCase: deleteTaskListUseCase,
     editTaskListUseCase: editTaskListUseCase,
@@ -95,7 +75,7 @@ void main() {
   );
 
   final todoListViewModel = TodoListViewModel(
-    taskListRepository: taskListRepo,
+    repository: graphRepo,
     createTaskUseCase: createTaskUseCase,
     deleteTaskUseCase: deleteTaskUseCase,
     editTaskUseCase: editTaskUseCase,
@@ -104,7 +84,7 @@ void main() {
   );
 
   final peopleViewModel = PeopleViewModel(
-    personRepository: personRepo,
+    repository: graphRepo,
     createPersonUseCase: createPersonUseCase,
     editPersonUseCase: editPersonUseCase,
     deletePersonUseCase: deletePersonUseCase,
@@ -112,7 +92,7 @@ void main() {
   );
 
   final organizationsViewModel = OrganizationsViewModel(
-    organizationRepository: organizationRepo,
+    repository: graphRepo,
     createOrganizationUseCase: createOrganizationUseCase,
     editOrganizationUseCase: editOrganizationUseCase,
     deleteOrganizationUseCase: deleteOrganizationUseCase,

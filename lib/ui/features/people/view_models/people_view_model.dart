@@ -2,26 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
-import 'package:knowledge_graph/data/repositories/person_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 
 class PeopleViewModel extends ChangeNotifier {
   static final _log = Logger('PeopleViewModel');
 
-  final PersonRepository _personRepository;
+  final Repository<Thing> _repository;
   final CreatePersonUseCase _createPersonUseCase;
   final EditPersonUseCase _editPersonUseCase;
   final DeletePersonUseCase _deletePersonUseCase;
   final GraphViewModel _graphViewModel;
 
   PeopleViewModel({
-    required PersonRepository personRepository,
+    required Repository<Thing> repository,
     required CreatePersonUseCase createPersonUseCase,
     required EditPersonUseCase editPersonUseCase,
     required DeletePersonUseCase deletePersonUseCase,
     required GraphViewModel graphViewModel,
-  }) : _personRepository = personRepository,
+  }) : _repository = repository,
        _createPersonUseCase = createPersonUseCase,
        _editPersonUseCase = editPersonUseCase,
        _deletePersonUseCase = deletePersonUseCase,
@@ -41,9 +41,10 @@ class PeopleViewModel extends ChangeNotifier {
     });
 
     try {
-      _people = await _personRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _people = items.whereType<Person>().toList();
       _graphViewModel.merge(_people);
     } finally {
       _isLoading = false;

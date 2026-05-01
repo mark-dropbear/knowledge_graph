@@ -2,16 +2,15 @@ import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/list_item.dart';
-import 'package:knowledge_graph/data/repositories/task_repository.dart';
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
+import 'package:data_layer/data_layer.dart';
 
 class CreateTaskUseCase {
   static final _log = Logger('CreateTaskUseCase');
 
-  final TaskRepository _taskRepository;
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
 
-  CreateTaskUseCase(this._taskRepository, this._taskListRepository);
+  CreateTaskUseCase(this._repository);
 
   Future<void> execute(
     TaskList list,
@@ -26,7 +25,7 @@ class CreateTaskUseCase {
       actionStatus: TaskStatus.potential,
       agent: agent,
     );
-    final savedTask = await _taskRepository.setItem(task);
+    final savedTask = await _repository.setItem(task);
     _log.fine(
       'Task saved successfully to repository with ID: ${savedTask?.id}',
     );
@@ -41,7 +40,7 @@ class CreateTaskUseCase {
     );
 
     // 3. Save updated TaskList
-    await _taskListRepository.setItem(updatedList);
+    await _repository.setItem(updatedList);
     _log.fine('TaskList updated and saved with new task reference');
   }
 }
@@ -49,10 +48,9 @@ class CreateTaskUseCase {
 class DeleteTaskUseCase {
   static final _log = Logger('DeleteTaskUseCase');
 
-  final TaskRepository _taskRepository;
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
 
-  DeleteTaskUseCase(this._taskRepository, this._taskListRepository);
+  DeleteTaskUseCase(this._repository);
 
   Future<void> execute(TaskList list, String taskId) async {
     // 1. Remove from TaskList and recompute positions
@@ -69,11 +67,11 @@ class DeleteTaskUseCase {
     );
 
     // 2. Save updated TaskList
-    await _taskListRepository.setItem(updatedList);
+    await _repository.setItem(updatedList);
     _log.fine('TaskList updated and saved without task reference');
 
     // 3. Delete Task from TaskRepository
-    await _taskRepository.delete(taskId);
+    await _repository.delete(taskId);
     _log.fine('Task deleted from repository: $taskId');
   }
 }
@@ -81,9 +79,9 @@ class DeleteTaskUseCase {
 class HydrateTaskListUseCase {
   static final _log = Logger('HydrateTaskListUseCase');
 
-  final TaskRepository _taskRepository;
+  final Repository<Thing> _repository;
 
-  HydrateTaskListUseCase(this._taskRepository);
+  HydrateTaskListUseCase(this._repository);
 
   Future<List<Task>> execute(TaskList list) async {
     final sortedItems = List<ListItem>.from(list.itemListElement)
@@ -93,8 +91,9 @@ class HydrateTaskListUseCase {
     if (taskIds.isEmpty) return [];
 
     _log.fine('Hydrating ${taskIds.length} tasks for TaskList');
-    final tasks = await _taskRepository.getByIds(taskIds);
-    final taskMap = {for (var task in tasks.$1) task.id: task};
+    final (foundTasks, _) = await _repository.getByIds(taskIds);
+    final tasks = foundTasks.whereType<Task>().toList();
+    final taskMap = {for (var task in tasks) task.id: task};
 
     return sortedItems.map((e) => taskMap[e.item]).whereType<Task>().toList();
   }
@@ -103,9 +102,9 @@ class HydrateTaskListUseCase {
 class ToggleTaskStatusUseCase {
   static final _log = Logger('ToggleTaskStatusUseCase');
 
-  final TaskRepository _taskRepository;
+  final Repository<Thing> _repository;
 
-  ToggleTaskStatusUseCase(this._taskRepository);
+  ToggleTaskStatusUseCase(this._repository);
 
   Future<void> execute(Task task) async {
     final newStatus = task.actionStatus == TaskStatus.completed
@@ -119,7 +118,7 @@ class ToggleTaskStatusUseCase {
           : null,
     );
 
-    await _taskRepository.setItem(updatedTask);
+    await _repository.setItem(updatedTask);
     _log.fine('Task status toggled and saved: ${updatedTask.id} -> $newStatus');
   }
 }
@@ -127,14 +126,14 @@ class ToggleTaskStatusUseCase {
 class CreateTaskListUseCase {
   static final _log = Logger('CreateTaskListUseCase');
 
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
 
-  CreateTaskListUseCase(this._taskListRepository);
+  CreateTaskListUseCase(this._repository);
 
   Future<void> execute(String name, {String? description}) async {
     final list = TaskList(id: '', name: name, description: description);
 
-    final savedList = await _taskListRepository.setItem(list);
+    final savedList = await _repository.setItem(list);
     _log.fine(
       'TaskList saved successfully to repository with ID: ${savedList?.id}',
     );
@@ -144,19 +143,18 @@ class CreateTaskListUseCase {
 class DeleteTaskListUseCase {
   static final _log = Logger('DeleteTaskListUseCase');
 
-  final TaskListRepository _taskListRepository;
-  final TaskRepository _taskRepository;
+  final Repository<Thing> _repository;
 
-  DeleteTaskListUseCase(this._taskListRepository, this._taskRepository);
+  DeleteTaskListUseCase(this._repository);
 
   Future<void> execute(TaskList list) async {
     // Delete all tasks in the list first
     for (final item in list.itemListElement) {
-      await _taskRepository.delete(item.item);
+      await _repository.delete(item.item);
     }
 
     // Delete the list itself
-    await _taskListRepository.delete(list.id);
+    await _repository.delete(list.id);
     _log.fine('TaskList deleted from repository: ${list.id}');
   }
 }
@@ -164,9 +162,9 @@ class DeleteTaskListUseCase {
 class EditTaskListUseCase {
   static final _log = Logger('EditTaskListUseCase');
 
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
 
-  EditTaskListUseCase(this._taskListRepository);
+  EditTaskListUseCase(this._repository);
 
   Future<void> execute(
     TaskList list,
@@ -178,7 +176,7 @@ class EditTaskListUseCase {
       description: newDescription,
     );
 
-    await _taskListRepository.setItem(updatedList);
+    await _repository.setItem(updatedList);
     _log.fine('TaskList updated successfully in repository: ${updatedList.id}');
   }
 }
@@ -186,9 +184,9 @@ class EditTaskListUseCase {
 class EditTaskUseCase {
   static final _log = Logger('EditTaskUseCase');
 
-  final TaskRepository _taskRepository;
+  final Repository<Thing> _repository;
 
-  EditTaskUseCase(this._taskRepository);
+  EditTaskUseCase(this._repository);
 
   Future<void> execute(
     Task task,
@@ -202,7 +200,7 @@ class EditTaskUseCase {
       agent: newAgent,
     );
 
-    await _taskRepository.setItem(updatedTask);
+    await _repository.setItem(updatedTask);
     _log.fine('Task updated successfully in repository: ${updatedTask.id}');
   }
 }

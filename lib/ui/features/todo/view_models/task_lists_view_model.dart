@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
@@ -9,19 +9,19 @@ import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 class TaskListsViewModel extends ChangeNotifier {
   static final _log = Logger('TaskListsViewModel');
 
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
   final CreateTaskListUseCase _createTaskListUseCase;
   final DeleteTaskListUseCase _deleteTaskListUseCase;
   final EditTaskListUseCase _editTaskListUseCase;
   final ExportDatasetUseCase _exportDatasetUseCase;
 
   TaskListsViewModel({
-    required TaskListRepository taskListRepository,
+    required Repository<Thing> repository,
     required CreateTaskListUseCase createTaskListUseCase,
     required DeleteTaskListUseCase deleteTaskListUseCase,
     required EditTaskListUseCase editTaskListUseCase,
     required ExportDatasetUseCase exportDatasetUseCase,
-  }) : _taskListRepository = taskListRepository,
+  }) : _repository = repository,
        _createTaskListUseCase = createTaskListUseCase,
        _deleteTaskListUseCase = deleteTaskListUseCase,
        _editTaskListUseCase = editTaskListUseCase,
@@ -41,9 +41,10 @@ class TaskListsViewModel extends ChangeNotifier {
     });
 
     try {
-      _lists = await _taskListRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _lists = items.whereType<TaskList>().toList();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -59,9 +60,10 @@ class TaskListsViewModel extends ChangeNotifier {
 
     try {
       await _createTaskListUseCase.execute(name, description: description);
-      _lists = await _taskListRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _lists = items.whereType<TaskList>().toList();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -75,9 +77,10 @@ class TaskListsViewModel extends ChangeNotifier {
 
     try {
       await _deleteTaskListUseCase.execute(list);
-      _lists = await _taskListRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _lists = items.whereType<TaskList>().toList();
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -101,9 +104,10 @@ class TaskListsViewModel extends ChangeNotifier {
         newName,
         newDescription: newDescription,
       );
-      _lists = await _taskListRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _lists = items.whereType<TaskList>().toList();
     } finally {
       _isLoading = false;
       notifyListeners();

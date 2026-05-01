@@ -101,6 +101,7 @@ class Task implements Thing {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() {
     return {
       '@type': type,

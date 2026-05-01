@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
-import 'package:knowledge_graph/data/repositories/task_repository.dart';
+import 'package:knowledge_graph/data/repositories/graph_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 
 import 'package:knowledge_graph/domain/models/task_list.dart';
@@ -13,23 +12,22 @@ void main() {
     WidgetTester tester,
   ) async {
     // 1. Initialize real Repositories and UseCases for an integrated widget test
-    final taskRepo = TaskRepository();
-    final taskListRepo = TaskListRepository();
-    final createTaskUseCase = CreateTaskUseCase(taskRepo, taskListRepo);
-    final deleteTaskUseCase = DeleteTaskUseCase(taskRepo, taskListRepo);
-    final editTaskUseCase = EditTaskUseCase(taskRepo);
-    final hydrateUseCase = HydrateTaskListUseCase(taskRepo);
-    final toggleStatusUseCase = ToggleTaskStatusUseCase(taskRepo);
+    final graphRepo = GraphRepository();
+    final createTaskUseCase = CreateTaskUseCase(graphRepo);
+    final deleteTaskUseCase = DeleteTaskUseCase(graphRepo);
+    final editTaskUseCase = EditTaskUseCase(graphRepo);
+    final hydrateUseCase = HydrateTaskListUseCase(graphRepo);
+    final toggleStatusUseCase = ToggleTaskStatusUseCase(graphRepo);
 
     // Pre-seed a default list for testing
     final testList = TaskList(id: 'urn:uuid:test-list', name: 'Test Tasks');
-    await taskListRepo.setItem(testList);
+    await graphRepo.setItem(testList);
 
     // Pre-seed a task for testing toggle and dismiss
     await createTaskUseCase.execute(testList, 'Buy groceries');
 
     final viewModel = TodoListViewModel(
-      taskListRepository: taskListRepo,
+      repository: graphRepo,
       createTaskUseCase: createTaskUseCase,
       deleteTaskUseCase: deleteTaskUseCase,
       editTaskUseCase: editTaskUseCase,

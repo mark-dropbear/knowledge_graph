@@ -2,28 +2,22 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
-import 'package:knowledge_graph/data/repositories/person_repository.dart';
-import 'package:knowledge_graph/data/repositories/organization_repository.dart';
+import 'package:knowledge_graph/data/repositories/graph_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 
-@GenerateNiceMocks([
-  MockSpec<PersonRepository>(),
-  MockSpec<OrganizationRepository>(),
-])
+@GenerateNiceMocks([MockSpec<GraphRepository>()])
 import 'person_use_cases_test.mocks.dart';
 
 void main() {
   group('Person Use Cases', () {
-    late MockPersonRepository mockPersonRepo;
-    late MockOrganizationRepository mockOrganizationRepo;
+    late MockGraphRepository mockGraphRepo;
 
     setUp(() {
-      mockPersonRepo = MockPersonRepository();
-      mockOrganizationRepo = MockOrganizationRepository();
+      mockGraphRepo = MockGraphRepository();
     });
 
     test('CreatePersonUseCase saves new person', () async {
-      final useCase = CreatePersonUseCase(mockPersonRepo, mockOrganizationRepo);
+      final useCase = CreatePersonUseCase(mockGraphRepo);
 
       await useCase.execute(
         givenName: 'John',
@@ -31,7 +25,7 @@ void main() {
         jobTitle: 'Developer',
       );
 
-      final capture = verify(mockPersonRepo.setItem(captureAny)).captured;
+      final capture = verify(mockGraphRepo.setItem(captureAny)).captured;
       final savedPerson = capture.first as Person;
 
       expect(savedPerson.givenName, 'John');
@@ -41,7 +35,7 @@ void main() {
     });
 
     test('EditPersonUseCase updates person fields', () async {
-      final useCase = EditPersonUseCase(mockPersonRepo, mockOrganizationRepo);
+      final useCase = EditPersonUseCase(mockGraphRepo);
       final initialPerson = Person(
         id: 'urn:uuid:123',
         givenName: 'John',
@@ -54,7 +48,7 @@ void main() {
         familyName: 'Doe',
       );
 
-      final capture = verify(mockPersonRepo.setItem(captureAny)).captured;
+      final capture = verify(mockGraphRepo.setItem(captureAny)).captured;
       final updatedPerson = capture.first as Person;
 
       expect(updatedPerson.givenName, 'Jane');
@@ -62,12 +56,12 @@ void main() {
     });
 
     test('DeletePersonUseCase deletes person', () async {
-      final useCase = DeletePersonUseCase(mockPersonRepo, mockOrganizationRepo);
+      final useCase = DeletePersonUseCase(mockGraphRepo);
       final person = Person(id: 'urn:uuid:123', givenName: 'John');
 
       await useCase.execute(person);
 
-      verify(mockPersonRepo.delete('urn:uuid:123')).called(1);
+      verify(mockGraphRepo.delete('urn:uuid:123')).called(1);
     });
   });
 }

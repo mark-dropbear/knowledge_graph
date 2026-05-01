@@ -1,14 +1,44 @@
 import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
-import 'package:knowledge_graph/data/repositories/person_repository.dart';
-import 'package:knowledge_graph/data/repositories/organization_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
+import 'package:data_layer/data_layer.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
+
+Future<void> _addPersonToOrganizations(
+  Repository<Thing> repository,
+  String personId,
+  Set<String> orgIds,
+) async {
+  if (orgIds.isEmpty) return;
+  final (foundOrgs, _) = await repository.getByIds(orgIds);
+  for (final org in foundOrgs.whereType<Organization>()) {
+    if (!org.employee.contains(personId)) {
+      final updatedEmployee = List<String>.from(org.employee)..add(personId);
+      await repository.setItem(org.copyWith(employee: updatedEmployee));
+    }
+  }
+}
+
+Future<void> _removePersonFromOrganizations(
+  Repository<Thing> repository,
+  String personId,
+  Set<String> orgIds,
+) async {
+  if (orgIds.isEmpty) return;
+  final (foundOrgs, _) = await repository.getByIds(orgIds);
+  for (final org in foundOrgs.whereType<Organization>()) {
+    if (org.employee.contains(personId)) {
+      final updatedEmployee = List<String>.from(org.employee)..remove(personId);
+      await repository.setItem(org.copyWith(employee: updatedEmployee));
+    }
+  }
+}
 
 class CreatePersonUseCase {
   final Logger _log = Logger('CreatePersonUseCase');
-  final PersonRepository _personRepository;
-  final OrganizationRepository _organizationRepository;
+  final Repository<Thing> _repository;
 
-  CreatePersonUseCase(this._personRepository, this._organizationRepository);
+  CreatePersonUseCase(this._repository);
 
   Future<void> execute({
     String? givenName,
@@ -26,19 +56,14 @@ class CreatePersonUseCase {
       birthDate: birthDate,
       worksFor: worksFor,
     );
-    final savedPerson = await _personRepository.setItem(newPerson);
+    final savedPerson = await _repository.setItem(newPerson);
 
     if (savedPerson != null && worksFor != null && worksFor.isNotEmpty) {
-      final orgs = await _organizationRepository.getByIds(worksFor.toSet());
-      for (final org in orgs.$1) {
-        if (!org.employee.contains(savedPerson.id)) {
-          final updatedEmployee = List<String>.from(org.employee)
-            ..add(savedPerson.id);
-          await _organizationRepository.setItem(
-            org.copyWith(employee: updatedEmployee),
-          );
-        }
-      }
+      await _addPersonToOrganizations(
+        _repository,
+        savedPerson.id,
+        worksFor.toSet(),
+      );
     }
 
     _log.fine('Person saved successfully to repository');
@@ -47,10 +72,9 @@ class CreatePersonUseCase {
 
 class EditPersonUseCase {
   final Logger _log = Logger('EditPersonUseCase');
-  final PersonRepository _personRepository;
-  final OrganizationRepository _organizationRepository;
+  final Repository<Thing> _repository;
 
-  EditPersonUseCase(this._personRepository, this._organizationRepository);
+  EditPersonUseCase(this._repository);
 
   Future<void> execute(
     Person person, {
@@ -72,42 +96,22 @@ class EditPersonUseCase {
       clearJobTitle: jobTitle == null || jobTitle.trim().isEmpty,
       clearBirthDate: birthDate == null || birthDate.trim().isEmpty,
     );
-    await _personRepository.setItem(updatedPerson);
+    await _repository.setItem(updatedPerson);
 
     if (worksFor != null) {
       final oldWorksFor = person.worksFor.toSet();
       final newWorksFor = worksFor.toSet();
 
-      final addedOrgs = newWorksFor.difference(oldWorksFor);
-      final removedOrgs = oldWorksFor.difference(newWorksFor);
-
-      if (addedOrgs.isNotEmpty) {
-        final orgsToAdd = await _organizationRepository.getByIds(addedOrgs);
-        for (final org in orgsToAdd.$1) {
-          if (!org.employee.contains(person.id)) {
-            final updatedEmployee = List<String>.from(org.employee)
-              ..add(person.id);
-            await _organizationRepository.setItem(
-              org.copyWith(employee: updatedEmployee),
-            );
-          }
-        }
-      }
-
-      if (removedOrgs.isNotEmpty) {
-        final orgsToRemove = await _organizationRepository.getByIds(
-          removedOrgs,
-        );
-        for (final org in orgsToRemove.$1) {
-          if (org.employee.contains(person.id)) {
-            final updatedEmployee = List<String>.from(org.employee)
-              ..remove(person.id);
-            await _organizationRepository.setItem(
-              org.copyWith(employee: updatedEmployee),
-            );
-          }
-        }
-      }
+      await _addPersonToOrganizations(
+        _repository,
+        person.id,
+        newWorksFor.difference(oldWorksFor),
+      );
+      await _removePersonFromOrganizations(
+        _repository,
+        person.id,
+        oldWorksFor.difference(newWorksFor),
+      );
     }
 
     _log.fine('Person updated successfully in repository');
@@ -116,30 +120,22 @@ class EditPersonUseCase {
 
 class DeletePersonUseCase {
   final Logger _log = Logger('DeletePersonUseCase');
-  final PersonRepository _personRepository;
-  final OrganizationRepository _organizationRepository;
+  final Repository<Thing> _repository;
 
-  DeletePersonUseCase(this._personRepository, this._organizationRepository);
+  DeletePersonUseCase(this._repository);
 
   Future<void> execute(Person person) async {
     _log.info('Deleting person: ${person.id}');
 
     if (person.worksFor.isNotEmpty) {
-      final orgsToUpdate = await _organizationRepository.getByIds(
+      await _removePersonFromOrganizations(
+        _repository,
+        person.id,
         person.worksFor.toSet(),
       );
-      for (final org in orgsToUpdate.$1) {
-        if (org.employee.contains(person.id)) {
-          final updatedEmployee = List<String>.from(org.employee)
-            ..remove(person.id);
-          await _organizationRepository.setItem(
-            org.copyWith(employee: updatedEmployee),
-          );
-        }
-      }
     }
 
-    await _personRepository.delete(person.id);
+    await _repository.delete(person.id);
     _log.fine('Person deleted from repository');
   }
 }

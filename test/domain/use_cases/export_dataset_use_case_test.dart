@@ -7,39 +7,20 @@ import 'package:knowledge_graph/domain/models/list_item.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
-import 'package:knowledge_graph/data/repositories/task_repository.dart';
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
-import 'package:knowledge_graph/data/repositories/person_repository.dart';
-import 'package:knowledge_graph/data/repositories/organization_repository.dart';
+import 'package:knowledge_graph/data/repositories/graph_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
 
-@GenerateNiceMocks([
-  MockSpec<TaskRepository>(),
-  MockSpec<TaskListRepository>(),
-  MockSpec<PersonRepository>(),
-  MockSpec<OrganizationRepository>(),
-])
+@GenerateNiceMocks([MockSpec<GraphRepository>()])
 import 'export_dataset_use_case_test.mocks.dart';
 
 void main() {
   group('ExportDatasetUseCase', () {
-    late MockTaskRepository mockTaskRepo;
-    late MockTaskListRepository mockTaskListRepo;
-    late MockPersonRepository mockPersonRepo;
-    late MockOrganizationRepository mockOrganizationRepo;
+    late MockGraphRepository mockGraphRepo;
     late ExportDatasetUseCase useCase;
 
     setUp(() {
-      mockTaskRepo = MockTaskRepository();
-      mockTaskListRepo = MockTaskListRepository();
-      mockPersonRepo = MockPersonRepository();
-      mockOrganizationRepo = MockOrganizationRepository();
-      useCase = ExportDatasetUseCase(
-        mockTaskListRepo,
-        mockTaskRepo,
-        mockPersonRepo,
-        mockOrganizationRepo,
-      );
+      mockGraphRepo = MockGraphRepository();
+      useCase = ExportDatasetUseCase(mockGraphRepo);
     });
 
     test('exports canonical JSON-LD dataset with @graph', () async {
@@ -77,17 +58,8 @@ void main() {
       );
 
       when(
-        mockTaskListRepo.getItems(details: anyNamed('details')),
-      ).thenAnswer((_) async => [taskList]);
-      when(
-        mockTaskRepo.getByIds(any),
-      ).thenAnswer((_) async => ([task1, task2], <String>{}));
-      when(
-        mockPersonRepo.getItems(details: anyNamed('details')),
-      ).thenAnswer((_) async => [person]);
-      when(
-        mockOrganizationRepo.getItems(details: anyNamed('details')),
-      ).thenAnswer((_) async => [organization]);
+        mockGraphRepo.getItems(details: anyNamed('details')),
+      ).thenAnswer((_) async => [taskList, task1, task2, person, organization]);
 
       final jsonString = await useCase.execute();
       final dataset = jsonDecode(jsonString) as Map<String, dynamic>;

@@ -2,13 +2,14 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
-import 'package:knowledge_graph/data/repositories/task_list_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
+import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 
 class TodoListViewModel extends ChangeNotifier {
   static final _log = Logger('TodoListViewModel');
 
-  final TaskListRepository _taskListRepository;
+  final Repository<Thing> _repository;
   final CreateTaskUseCase _createTaskUseCase;
   final DeleteTaskUseCase _deleteTaskUseCase;
   final EditTaskUseCase _editTaskUseCase;
@@ -16,13 +17,13 @@ class TodoListViewModel extends ChangeNotifier {
   final ToggleTaskStatusUseCase _toggleStatusUseCase;
 
   TodoListViewModel({
-    required TaskListRepository taskListRepository,
+    required Repository<Thing> repository,
     required CreateTaskUseCase createTaskUseCase,
     required DeleteTaskUseCase deleteTaskUseCase,
     required EditTaskUseCase editTaskUseCase,
     required HydrateTaskListUseCase hydrateUseCase,
     required ToggleTaskStatusUseCase toggleStatusUseCase,
-  }) : _taskListRepository = taskListRepository,
+  }) : _repository = repository,
        _createTaskUseCase = createTaskUseCase,
        _deleteTaskUseCase = deleteTaskUseCase,
        _editTaskUseCase = editTaskUseCase,
@@ -46,7 +47,8 @@ class TodoListViewModel extends ChangeNotifier {
     });
 
     try {
-      _currentList = await _taskListRepository.getById(listId);
+      final thing = await _repository.getById(listId);
+      _currentList = thing is TaskList ? thing : null;
       if (_currentList == null) {
         _log.warning('TaskList not found: $listId');
       } else {
@@ -82,7 +84,8 @@ class TodoListViewModel extends ChangeNotifier {
         description: description,
         agent: agent,
       );
-      _currentList = await _taskListRepository.getById(_currentList!.id);
+      final thing = await _repository.getById(_currentList!.id);
+      _currentList = thing is TaskList ? thing : null;
       await _hydrateTasks();
     } finally {
       _isLoading = false;
@@ -99,7 +102,8 @@ class TodoListViewModel extends ChangeNotifier {
 
     try {
       await _deleteTaskUseCase.execute(_currentList!, task.id);
-      _currentList = await _taskListRepository.getById(_currentList!.id);
+      final thing = await _repository.getById(_currentList!.id);
+      _currentList = thing is TaskList ? thing : null;
       await _hydrateTasks();
     } finally {
       _isLoading = false;

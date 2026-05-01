@@ -2,26 +2,26 @@ import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
-import 'package:knowledge_graph/data/repositories/organization_repository.dart';
+import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 
 class OrganizationsViewModel extends ChangeNotifier {
   static final _log = Logger('OrganizationsViewModel');
 
-  final OrganizationRepository _organizationRepository;
+  final Repository<Thing> _repository;
   final CreateOrganizationUseCase _createOrganizationUseCase;
   final EditOrganizationUseCase _editOrganizationUseCase;
   final DeleteOrganizationUseCase _deleteOrganizationUseCase;
   final GraphViewModel _graphViewModel;
 
   OrganizationsViewModel({
-    required OrganizationRepository organizationRepository,
+    required Repository<Thing> repository,
     required CreateOrganizationUseCase createOrganizationUseCase,
     required EditOrganizationUseCase editOrganizationUseCase,
     required DeleteOrganizationUseCase deleteOrganizationUseCase,
     required GraphViewModel graphViewModel,
-  }) : _organizationRepository = organizationRepository,
+  }) : _repository = repository,
        _createOrganizationUseCase = createOrganizationUseCase,
        _editOrganizationUseCase = editOrganizationUseCase,
        _deleteOrganizationUseCase = deleteOrganizationUseCase,
@@ -41,9 +41,10 @@ class OrganizationsViewModel extends ChangeNotifier {
     });
 
     try {
-      _organizations = await _organizationRepository.getItems(
+      final items = await _repository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _organizations = items.whereType<Organization>().toList();
       _graphViewModel.merge(_organizations);
     } finally {
       _isLoading = false;
