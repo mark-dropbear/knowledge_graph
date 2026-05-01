@@ -92,10 +92,9 @@ class Organization implements Thing {
     List<String> parsedEmployee = [];
     if (json['employee'] != null) {
       if (json['employee'] is List) {
-        parsedEmployee =
-            (json['employee'] as List)
-                .map((e) => (e as Map<String, dynamic>)['@id'] as String)
-                .toList();
+        parsedEmployee = (json['employee'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
       } else if (json['employee'] is Map) {
         parsedEmployee = [json['employee']['@id'] as String];
       }

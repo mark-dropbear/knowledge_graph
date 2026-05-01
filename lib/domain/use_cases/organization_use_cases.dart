@@ -8,7 +8,10 @@ class CreateOrganizationUseCase {
   final OrganizationRepository _organizationRepository;
   final PersonRepository _personRepository;
 
-  CreateOrganizationUseCase(this._organizationRepository, this._personRepository);
+  CreateOrganizationUseCase(
+    this._organizationRepository,
+    this._personRepository,
+  );
 
   Future<void> execute({
     required String name,
@@ -28,18 +31,23 @@ class CreateOrganizationUseCase {
       url: url,
       employee: employee,
     );
-    final savedOrganization = await _organizationRepository.setItem(newOrganization);
-    
+    final savedOrganization = await _organizationRepository.setItem(
+      newOrganization,
+    );
+
     if (savedOrganization != null && employee != null && employee.isNotEmpty) {
       final people = await _personRepository.getByIds(employee.toSet());
       for (final person in people.$1) {
         if (!person.worksFor.contains(savedOrganization.id)) {
-          final updatedWorksFor = List<String>.from(person.worksFor)..add(savedOrganization.id);
-          await _personRepository.setItem(person.copyWith(worksFor: updatedWorksFor));
+          final updatedWorksFor = List<String>.from(person.worksFor)
+            ..add(savedOrganization.id);
+          await _personRepository.setItem(
+            person.copyWith(worksFor: updatedWorksFor),
+          );
         }
       }
     }
-    
+
     _log.fine('Organization saved successfully to repository');
   }
 }
@@ -85,8 +93,11 @@ class EditOrganizationUseCase {
         final peopleToAdd = await _personRepository.getByIds(addedPeople);
         for (final person in peopleToAdd.$1) {
           if (!person.worksFor.contains(organization.id)) {
-            final updatedWorksFor = List<String>.from(person.worksFor)..add(organization.id);
-            await _personRepository.setItem(person.copyWith(worksFor: updatedWorksFor));
+            final updatedWorksFor = List<String>.from(person.worksFor)
+              ..add(organization.id);
+            await _personRepository.setItem(
+              person.copyWith(worksFor: updatedWorksFor),
+            );
           }
         }
       }
@@ -95,8 +106,11 @@ class EditOrganizationUseCase {
         final peopleToRemove = await _personRepository.getByIds(removedPeople);
         for (final person in peopleToRemove.$1) {
           if (person.worksFor.contains(organization.id)) {
-            final updatedWorksFor = List<String>.from(person.worksFor)..remove(organization.id);
-            await _personRepository.setItem(person.copyWith(worksFor: updatedWorksFor));
+            final updatedWorksFor = List<String>.from(person.worksFor)
+              ..remove(organization.id);
+            await _personRepository.setItem(
+              person.copyWith(worksFor: updatedWorksFor),
+            );
           }
         }
       }
@@ -111,17 +125,25 @@ class DeleteOrganizationUseCase {
   final OrganizationRepository _organizationRepository;
   final PersonRepository _personRepository;
 
-  DeleteOrganizationUseCase(this._organizationRepository, this._personRepository);
+  DeleteOrganizationUseCase(
+    this._organizationRepository,
+    this._personRepository,
+  );
 
   Future<void> execute(Organization organization) async {
     _log.info('Deleting organization: ${organization.id}');
-    
+
     if (organization.employee.isNotEmpty) {
-      final peopleToUpdate = await _personRepository.getByIds(organization.employee.toSet());
+      final peopleToUpdate = await _personRepository.getByIds(
+        organization.employee.toSet(),
+      );
       for (final person in peopleToUpdate.$1) {
         if (person.worksFor.contains(organization.id)) {
-          final updatedWorksFor = List<String>.from(person.worksFor)..remove(organization.id);
-          await _personRepository.setItem(person.copyWith(worksFor: updatedWorksFor));
+          final updatedWorksFor = List<String>.from(person.worksFor)
+            ..remove(organization.id);
+          await _personRepository.setItem(
+            person.copyWith(worksFor: updatedWorksFor),
+          );
         }
       }
     }

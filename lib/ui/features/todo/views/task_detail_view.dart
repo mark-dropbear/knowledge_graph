@@ -15,7 +15,6 @@ class TaskDetailView extends StatelessWidget {
     required this.taskId,
   });
 
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(

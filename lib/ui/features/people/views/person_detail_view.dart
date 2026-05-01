@@ -38,13 +38,18 @@ class PersonDetailView extends StatelessWidget {
           person.familyName,
         ].whereType<String>().join(' ');
 
-        final linkedOrgs = person.worksFor.map((orgId) {
-          try {
-            return organizationsViewModel.organizations.firstWhere((o) => o.id == orgId);
-          } catch (e) {
-            return null;
-          }
-        }).whereType<Organization>().toList();
+        final linkedOrgs = person.worksFor
+            .map((orgId) {
+              try {
+                return organizationsViewModel.organizations.firstWhere(
+                  (o) => o.id == orgId,
+                );
+              } catch (e) {
+                return null;
+              }
+            })
+            .whereType<Organization>()
+            .toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -96,18 +101,14 @@ class PersonDetailView extends StatelessWidget {
               _buildDetailRow(context, 'Given Name', person.givenName),
               _buildDetailRow(context, 'Family Name', person.familyName),
               _buildDetailRow(context, 'Job Title', person.jobTitle),
-              _buildDetailRow(
-                context,
-                'Birth Date',
-                person.birthDate,
-              ),
+              _buildDetailRow(context, 'Birth Date', person.birthDate),
               if (linkedOrgs.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 Text(
                   'Works For',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 ...linkedOrgs.map(

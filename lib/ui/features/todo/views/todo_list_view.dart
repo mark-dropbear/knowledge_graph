@@ -32,8 +32,6 @@ class _TodoListViewState extends State<TodoListView> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(

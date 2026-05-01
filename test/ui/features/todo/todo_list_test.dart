@@ -24,7 +24,7 @@ void main() {
     // Pre-seed a default list for testing
     final testList = TaskList(id: 'urn:uuid:test-list', name: 'Test Tasks');
     await taskListRepo.setItem(testList);
-    
+
     // Pre-seed a task for testing toggle and dismiss
     await createTaskUseCase.execute(testList, 'Buy groceries');
 

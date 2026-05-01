@@ -10,14 +10,14 @@ class PersonCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = '${person.givenName ?? ''} ${person.familyName ?? ''}'.trim();
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.person)),
         title: Text(name.isEmpty ? 'Unknown Person' : name),
-        subtitle: person.jobTitle != null && person.jobTitle!.isNotEmpty 
-            ? Text(person.jobTitle!) 
+        subtitle: person.jobTitle != null && person.jobTitle!.isNotEmpty
+            ? Text(person.jobTitle!)
             : null,
         trailing: onTap != null ? const Icon(Icons.chevron_right) : null,
         onTap: onTap,

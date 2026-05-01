@@ -93,30 +93,30 @@ class _ResourceSelectionModalState extends State<ResourceSelectionModal> {
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _items!.isEmpty
-                      ? const Center(child: Text('No items available.'))
-                      : ListView.builder(
-                          controller: scrollController,
-                          itemCount: _items!.length,
-                          itemBuilder: (context, index) {
-                            final id = _items!.keys.elementAt(index);
-                            final name = _items!.values.elementAt(index);
-                            final isSelected = _selectedIds.contains(id);
+                  ? const Center(child: Text('No items available.'))
+                  : ListView.builder(
+                      controller: scrollController,
+                      itemCount: _items!.length,
+                      itemBuilder: (context, index) {
+                        final id = _items!.keys.elementAt(index);
+                        final name = _items!.values.elementAt(index);
+                        final isSelected = _selectedIds.contains(id);
 
-                            return CheckboxListTile(
-                              title: Text(name),
-                              value: isSelected,
-                              onChanged: (bool? checked) {
-                                setState(() {
-                                  if (checked == true) {
-                                    _selectedIds.add(id);
-                                  } else {
-                                    _selectedIds.remove(id);
-                                  }
-                                });
-                              },
-                            );
+                        return CheckboxListTile(
+                          title: Text(name),
+                          value: isSelected,
+                          onChanged: (bool? checked) {
+                            setState(() {
+                              if (checked == true) {
+                                _selectedIds.add(id);
+                              } else {
+                                _selectedIds.remove(id);
+                              }
+                            });
                           },
-                        ),
+                        );
+                      },
+                    ),
             ),
             const Divider(height: 1),
             Padding(

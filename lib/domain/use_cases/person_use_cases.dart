@@ -27,17 +27,20 @@ class CreatePersonUseCase {
       worksFor: worksFor,
     );
     final savedPerson = await _personRepository.setItem(newPerson);
-    
+
     if (savedPerson != null && worksFor != null && worksFor.isNotEmpty) {
       final orgs = await _organizationRepository.getByIds(worksFor.toSet());
       for (final org in orgs.$1) {
         if (!org.employee.contains(savedPerson.id)) {
-          final updatedEmployee = List<String>.from(org.employee)..add(savedPerson.id);
-          await _organizationRepository.setItem(org.copyWith(employee: updatedEmployee));
+          final updatedEmployee = List<String>.from(org.employee)
+            ..add(savedPerson.id);
+          await _organizationRepository.setItem(
+            org.copyWith(employee: updatedEmployee),
+          );
         }
       }
     }
-    
+
     _log.fine('Person saved successfully to repository');
   }
 }
@@ -82,18 +85,26 @@ class EditPersonUseCase {
         final orgsToAdd = await _organizationRepository.getByIds(addedOrgs);
         for (final org in orgsToAdd.$1) {
           if (!org.employee.contains(person.id)) {
-            final updatedEmployee = List<String>.from(org.employee)..add(person.id);
-            await _organizationRepository.setItem(org.copyWith(employee: updatedEmployee));
+            final updatedEmployee = List<String>.from(org.employee)
+              ..add(person.id);
+            await _organizationRepository.setItem(
+              org.copyWith(employee: updatedEmployee),
+            );
           }
         }
       }
 
       if (removedOrgs.isNotEmpty) {
-        final orgsToRemove = await _organizationRepository.getByIds(removedOrgs);
+        final orgsToRemove = await _organizationRepository.getByIds(
+          removedOrgs,
+        );
         for (final org in orgsToRemove.$1) {
           if (org.employee.contains(person.id)) {
-            final updatedEmployee = List<String>.from(org.employee)..remove(person.id);
-            await _organizationRepository.setItem(org.copyWith(employee: updatedEmployee));
+            final updatedEmployee = List<String>.from(org.employee)
+              ..remove(person.id);
+            await _organizationRepository.setItem(
+              org.copyWith(employee: updatedEmployee),
+            );
           }
         }
       }
@@ -112,13 +123,18 @@ class DeletePersonUseCase {
 
   Future<void> execute(Person person) async {
     _log.info('Deleting person: ${person.id}');
-    
+
     if (person.worksFor.isNotEmpty) {
-      final orgsToUpdate = await _organizationRepository.getByIds(person.worksFor.toSet());
+      final orgsToUpdate = await _organizationRepository.getByIds(
+        person.worksFor.toSet(),
+      );
       for (final org in orgsToUpdate.$1) {
         if (org.employee.contains(person.id)) {
-          final updatedEmployee = List<String>.from(org.employee)..remove(person.id);
-          await _organizationRepository.setItem(org.copyWith(employee: updatedEmployee));
+          final updatedEmployee = List<String>.from(org.employee)
+            ..remove(person.id);
+          await _organizationRepository.setItem(
+            org.copyWith(employee: updatedEmployee),
+          );
         }
       }
     }

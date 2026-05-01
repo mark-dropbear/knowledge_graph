@@ -21,12 +21,12 @@ class Person implements Thing {
     this.jobTitle,
     this.birthDate,
     List<String>? worksFor,
-  })  : worksFor = worksFor ?? [],
-        assert(
-          (givenName != null && givenName.trim().isNotEmpty) ||
-              (familyName != null && familyName.trim().isNotEmpty),
-          'A Person must have at least a givenName or familyName.',
-        );
+  }) : worksFor = worksFor ?? [],
+       assert(
+         (givenName != null && givenName.trim().isNotEmpty) ||
+             (familyName != null && familyName.trim().isNotEmpty),
+         'A Person must have at least a givenName or familyName.',
+       );
 
   Person copyWith({
     String? id,
@@ -54,10 +54,9 @@ class Person implements Thing {
     List<String> parsedWorksFor = [];
     if (json['worksFor'] != null) {
       if (json['worksFor'] is List) {
-        parsedWorksFor =
-            (json['worksFor'] as List)
-                .map((e) => (e as Map<String, dynamic>)['@id'] as String)
-                .toList();
+        parsedWorksFor = (json['worksFor'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
       } else if (json['worksFor'] is Map) {
         parsedWorksFor = [json['worksFor']['@id'] as String];
       }

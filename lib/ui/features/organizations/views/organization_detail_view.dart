@@ -35,13 +35,18 @@ class OrganizationDetailView extends StatelessWidget {
           );
         }
 
-        final linkedPeople = organization.employee.map((personId) {
-          try {
-            return peopleViewModel.people.firstWhere((p) => p.id == personId);
-          } catch (e) {
-            return null;
-          }
-        }).whereType<Person>().toList();
+        final linkedPeople = organization.employee
+            .map((personId) {
+              try {
+                return peopleViewModel.people.firstWhere(
+                  (p) => p.id == personId,
+                );
+              } catch (e) {
+                return null;
+              }
+            })
+            .whereType<Person>()
+            .toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -105,8 +110,8 @@ class OrganizationDetailView extends StatelessWidget {
                 Text(
                   'Employees',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 ...linkedPeople.map(
