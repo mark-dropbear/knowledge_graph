@@ -51,6 +51,7 @@ class Task implements Thing {
   final TaskStatus actionStatus;
   final String? endTime;
   final List<String> agent;
+  final List<String> participant;
 
   Task({
     required this.id,
@@ -59,7 +60,9 @@ class Task implements Thing {
     required this.actionStatus,
     this.endTime,
     List<String>? agent,
-  }) : agent = agent ?? [];
+    List<String>? participant,
+  }) : agent = agent ?? [],
+       participant = participant ?? [];
 
   Task copyWith({
     String? id,
@@ -68,6 +71,7 @@ class Task implements Thing {
     TaskStatus? actionStatus,
     String? endTime,
     List<String>? agent,
+    List<String>? participant,
   }) {
     return Task(
       id: id ?? this.id,
@@ -76,6 +80,7 @@ class Task implements Thing {
       actionStatus: actionStatus ?? this.actionStatus,
       endTime: endTime ?? this.endTime,
       agent: agent ?? List.from(this.agent),
+      participant: participant ?? List.from(this.participant),
     );
   }
 
@@ -91,6 +96,17 @@ class Task implements Thing {
       }
     }
 
+    List<String> parsedParticipant = [];
+    if (json['participant'] != null) {
+      if (json['participant'] is List) {
+        parsedParticipant = (json['participant'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
+      } else if (json['participant'] is Map) {
+        parsedParticipant = [json['participant']['@id'] as String];
+      }
+    }
+
     return Task(
       id: json['@id'] as String,
       name: json['name'] as String,
@@ -98,6 +114,7 @@ class Task implements Thing {
       actionStatus: TaskStatus.fromSchemaUrl(json['actionStatus'] as String),
       endTime: json['endTime'] as String?,
       agent: parsedAgent,
+      participant: parsedParticipant,
     );
   }
 
@@ -111,6 +128,8 @@ class Task implements Thing {
       'actionStatus': actionStatus.toSchemaUrl(),
       if (endTime != null) 'endTime': endTime,
       if (agent.isNotEmpty) 'agent': agent.map((id) => {'@id': id}).toList(),
+      if (participant.isNotEmpty)
+        'participant': participant.map((id) => {'@id': id}).toList(),
     };
   }
 

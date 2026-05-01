@@ -29,6 +29,7 @@ class _TaskFormViewState extends State<TaskFormView> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   List<String> _selectedAgentIds = [];
+  List<String> _selectedParticipantIds = [];
   Task? _existingTask;
 
   @override
@@ -49,6 +50,7 @@ class _TaskFormViewState extends State<TaskFormView> {
       text: _existingTask?.description,
     );
     _selectedAgentIds = List.from(_existingTask?.agent ?? []);
+    _selectedParticipantIds = List.from(_existingTask?.participant ?? []);
   }
 
   @override
@@ -71,6 +73,7 @@ class _TaskFormViewState extends State<TaskFormView> {
         name,
         description: description.isEmpty ? null : description,
         agent: _selectedAgentIds,
+        participant: _selectedParticipantIds,
       );
     } else {
       await widget.viewModel.editTask(
@@ -78,6 +81,7 @@ class _TaskFormViewState extends State<TaskFormView> {
         name,
         newDescription: description.isEmpty ? null : description,
         newAgent: _selectedAgentIds,
+        newParticipant: _selectedParticipantIds,
       );
     }
 
@@ -127,6 +131,45 @@ class _TaskFormViewState extends State<TaskFormView> {
     );
   }
 
+  Future<void> _selectParticipants() async {
+    await MultiTypeResourceSelectionModal.show(
+      context: context,
+      title: 'Select Participants',
+      initialSelectedIds: _selectedParticipantIds,
+      tabs: [
+        ResourceTab(
+          label: 'People',
+          fetchItems: () async {
+            final people = widget.graphViewModel.getItems<Person>();
+            return Map.fromEntries(
+              people.map(
+                (p) => MapEntry(
+                  p.id,
+                  '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
+                ),
+              ),
+            );
+          },
+        ),
+        ResourceTab(
+          label: 'Organizations',
+          fetchItems: () async {
+            final organizations = widget.graphViewModel
+                .getItems<Organization>();
+            return Map.fromEntries(
+              organizations.map((o) => MapEntry(o.id, o.name)),
+            );
+          },
+        ),
+      ],
+      onSelectionSaved: (selectedIds) {
+        setState(() {
+          _selectedParticipantIds = selectedIds;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -171,6 +214,22 @@ class _TaskFormViewState extends State<TaskFormView> {
               trailing: FilledButton.tonal(
                 onPressed: _selectAssignees,
                 child: const Text('Edit Assignees'),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Participants',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text(
+                '${_selectedParticipantIds.length} participants selected',
+              ),
+              trailing: FilledButton.tonal(
+                onPressed: _selectParticipants,
+                child: const Text('Edit Participants'),
               ),
             ),
           ],

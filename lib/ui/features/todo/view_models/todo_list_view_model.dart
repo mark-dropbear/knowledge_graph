@@ -70,6 +70,7 @@ class TodoListViewModel extends ChangeNotifier {
     String name, {
     String? description,
     List<String>? agent,
+    List<String>? participant,
   }) async {
     if (_currentList == null || name.isEmpty) return;
 
@@ -83,6 +84,7 @@ class TodoListViewModel extends ChangeNotifier {
         name,
         description: description,
         agent: agent,
+        participant: participant,
       );
       final thing = await _repository.getById(_currentList!.id);
       _currentList = thing is TaskList ? thing : null;
@@ -132,6 +134,7 @@ class TodoListViewModel extends ChangeNotifier {
     String newName, {
     String? newDescription,
     List<String>? newAgent,
+    List<String>? newParticipant,
   }) async {
     if (newName.isEmpty) return;
 
@@ -145,6 +148,7 @@ class TodoListViewModel extends ChangeNotifier {
         newName,
         newDescription: newDescription,
         newAgent: newAgent,
+        newParticipant: newParticipant,
       );
       await _hydrateTasks();
     } finally {

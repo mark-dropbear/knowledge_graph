@@ -47,6 +47,21 @@ class TaskDetailView extends StatelessWidget {
             .whereType<Organization>()
             .toList();
 
+        final participantPeople = task.participant
+            .map(
+              (participantId) => graphViewModel.resolve<Person>(participantId),
+            )
+            .whereType<Person>()
+            .toList();
+
+        final participantOrganizations = task.participant
+            .map(
+              (participantId) =>
+                  graphViewModel.resolve<Organization>(participantId),
+            )
+            .whereType<Organization>()
+            .toList();
+
         return Scaffold(
           appBar: AppBar(
             title: Text(task.name),
@@ -119,6 +134,33 @@ class TaskDetailView extends StatelessWidget {
                   ),
                 ),
                 ...linkedOrganizations.map(
+                  (org) => OrganizationCard(
+                    organization: org,
+                    onTap: () => context.push(
+                      '/organizations/${Uri.encodeComponent(org.id)}',
+                    ),
+                  ),
+                ),
+              ],
+              if (participantPeople.isNotEmpty ||
+                  participantOrganizations.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Participants',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...participantPeople.map(
+                  (person) => PersonCard(
+                    person: person,
+                    onTap: () => context.push(
+                      '/people/${Uri.encodeComponent(person.id)}',
+                    ),
+                  ),
+                ),
+                ...participantOrganizations.map(
                   (org) => OrganizationCard(
                     organization: org,
                     onTap: () => context.push(
