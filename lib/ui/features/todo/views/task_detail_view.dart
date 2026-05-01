@@ -1,16 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
+import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
+import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
+import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
 
 class TaskDetailView extends StatelessWidget {
   final TodoListViewModel viewModel;
+  final PeopleViewModel peopleViewModel;
+  final OrganizationsViewModel organizationsViewModel;
   final String listId;
   final String taskId;
 
   const TaskDetailView({
     super.key,
     required this.viewModel,
+    required this.peopleViewModel,
+    required this.organizationsViewModel,
     required this.listId,
     required this.taskId,
   });
@@ -18,7 +28,11 @@ class TaskDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: Listenable.merge([
+        viewModel,
+        peopleViewModel,
+        organizationsViewModel,
+      ]),
       builder: (context, _) {
         Task? task;
         try {
@@ -29,6 +43,32 @@ class TaskDetailView extends StatelessWidget {
             body: const Center(child: Text('Task not found.')),
           );
         }
+
+        final linkedPeople = task.agent
+            .map((agentId) {
+              try {
+                return peopleViewModel.people.firstWhere(
+                  (p) => p.id == agentId,
+                );
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<Person>()
+            .toList();
+
+        final linkedOrganizations = task.agent
+            .map((agentId) {
+              try {
+                return organizationsViewModel.organizations.firstWhere(
+                  (o) => o.id == agentId,
+                );
+              } catch (_) {
+                return null;
+              }
+            })
+            .whereType<Organization>()
+            .toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -83,6 +123,33 @@ class TaskDetailView extends StatelessWidget {
               _buildDetailRow(context, 'Status', task.actionStatus.name),
               _buildDetailRow(context, 'Description', task.description),
               _buildDetailRow(context, 'End Time', task.endTime),
+              if (linkedPeople.isNotEmpty ||
+                  linkedOrganizations.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Assignees',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...linkedPeople.map(
+                  (person) => PersonCard(
+                    person: person,
+                    onTap: () => context.push(
+                      '/people/${Uri.encodeComponent(person.id)}',
+                    ),
+                  ),
+                ),
+                ...linkedOrganizations.map(
+                  (org) => OrganizationCard(
+                    organization: org,
+                    onTap: () => context.push(
+                      '/organizations/${Uri.encodeComponent(org.id)}',
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         );

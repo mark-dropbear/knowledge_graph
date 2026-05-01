@@ -64,7 +64,11 @@ class TodoListViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> addTask(String name, {String? description}) async {
+  Future<void> addTask(
+    String name, {
+    String? description,
+    List<String>? agent,
+  }) async {
     if (_currentList == null || name.isEmpty) return;
 
     _log.info('Adding new task: $name');
@@ -76,6 +80,7 @@ class TodoListViewModel extends ChangeNotifier {
         _currentList!,
         name,
         description: description,
+        agent: agent,
       );
       _currentList = await _taskListRepository.getById(_currentList!.id);
       await _hydrateTasks();
@@ -122,6 +127,7 @@ class TodoListViewModel extends ChangeNotifier {
     Task task,
     String newName, {
     String? newDescription,
+    List<String>? newAgent,
   }) async {
     if (newName.isEmpty) return;
 
@@ -134,6 +140,7 @@ class TodoListViewModel extends ChangeNotifier {
         task,
         newName,
         newDescription: newDescription,
+        newAgent: newAgent,
       );
       await _hydrateTasks();
     } finally {

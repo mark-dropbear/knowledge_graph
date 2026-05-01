@@ -50,6 +50,7 @@ class Task implements Thing {
   final String? description;
   final TaskStatus actionStatus;
   final String? endTime;
+  final List<String> agent;
 
   Task({
     required this.id,
@@ -57,7 +58,8 @@ class Task implements Thing {
     this.description,
     required this.actionStatus,
     this.endTime,
-  });
+    List<String>? agent,
+  }) : agent = agent ?? [];
 
   Task copyWith({
     String? id,
@@ -65,6 +67,7 @@ class Task implements Thing {
     String? description,
     TaskStatus? actionStatus,
     String? endTime,
+    List<String>? agent,
   }) {
     return Task(
       id: id ?? this.id,
@@ -72,16 +75,29 @@ class Task implements Thing {
       description: description ?? this.description,
       actionStatus: actionStatus ?? this.actionStatus,
       endTime: endTime ?? this.endTime,
+      agent: agent ?? List.from(this.agent),
     );
   }
 
   factory Task.fromJson(Map<String, dynamic> json) {
+    List<String> parsedAgent = [];
+    if (json['agent'] != null) {
+      if (json['agent'] is List) {
+        parsedAgent = (json['agent'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
+      } else if (json['agent'] is Map) {
+        parsedAgent = [json['agent']['@id'] as String];
+      }
+    }
+
     return Task(
       id: json['@id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
       actionStatus: TaskStatus.fromSchemaUrl(json['actionStatus'] as String),
       endTime: json['endTime'] as String?,
+      agent: parsedAgent,
     );
   }
 
@@ -93,6 +109,7 @@ class Task implements Thing {
       if (description != null) 'description': description,
       'actionStatus': actionStatus.toSchemaUrl(),
       if (endTime != null) 'endTime': endTime,
+      if (agent.isNotEmpty) 'agent': agent.map((id) => {'@id': id}).toList(),
     };
   }
 
