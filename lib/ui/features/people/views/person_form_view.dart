@@ -28,6 +28,7 @@ class _PersonFormViewState extends State<PersonFormView> {
   late final TextEditingController _jobTitleController;
   late final TextEditingController _birthDateController;
   List<String> _selectedWorksFor = [];
+  List<String> _selectedColleagues = [];
   Person? _existingPerson;
 
   @override
@@ -56,6 +57,7 @@ class _PersonFormViewState extends State<PersonFormView> {
       text: _existingPerson?.birthDate,
     );
     _selectedWorksFor = List.from(_existingPerson?.worksFor ?? []);
+    _selectedColleagues = List.from(_existingPerson?.colleague ?? []);
   }
 
   @override
@@ -86,6 +88,7 @@ class _PersonFormViewState extends State<PersonFormView> {
         jobTitle: jobTitle.isEmpty ? null : jobTitle,
         birthDate: birthDateStr.isEmpty ? null : birthDateStr,
         worksFor: _selectedWorksFor,
+        colleague: _selectedColleagues,
       );
     } else {
       await widget.viewModel.editPerson(
@@ -95,6 +98,7 @@ class _PersonFormViewState extends State<PersonFormView> {
         jobTitle: jobTitle.isEmpty ? null : jobTitle,
         birthDate: birthDateStr.isEmpty ? null : birthDateStr,
         worksFor: _selectedWorksFor,
+        colleague: _selectedColleagues,
       );
     }
 
@@ -123,6 +127,37 @@ class _PersonFormViewState extends State<PersonFormView> {
       onSelectionSaved: (selectedIds) {
         setState(() {
           _selectedWorksFor = selectedIds;
+        });
+      },
+    );
+  }
+
+  Future<void> _selectColleagues() async {
+    await MultiTypeResourceSelectionModal.show(
+      context: context,
+      title: 'Select Colleagues',
+      initialSelectedIds: _selectedColleagues,
+      tabs: [
+        ResourceTab(
+          label: 'People',
+          fetchItems: () async {
+            final people = widget.graphViewModel.getItems<Person>().where(
+              (p) => p.id != _existingPerson?.id,
+            );
+            return Map.fromEntries(
+              people.map(
+                (p) => MapEntry(
+                  p.id,
+                  '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+      onSelectionSaved: (selectedIds) {
+        setState(() {
+          _selectedColleagues = selectedIds;
         });
       },
     );
@@ -189,6 +224,17 @@ class _PersonFormViewState extends State<PersonFormView> {
               trailing: FilledButton.tonal(
                 onPressed: _selectOrganizations,
                 child: const Text('Edit Links'),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text('Colleagues', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('${_selectedColleagues.length} colleagues selected'),
+              trailing: FilledButton.tonal(
+                onPressed: _selectColleagues,
+                child: const Text('Edit Colleagues'),
               ),
             ),
           ],

@@ -13,6 +13,7 @@ class Person implements Thing {
   final String? jobTitle;
   final String? birthDate;
   final List<String> worksFor;
+  final List<String> colleague;
 
   Person({
     required this.id,
@@ -21,7 +22,9 @@ class Person implements Thing {
     this.jobTitle,
     this.birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
   }) : worksFor = worksFor ?? [],
+       colleague = colleague ?? [],
        assert(
          (givenName != null && givenName.trim().isNotEmpty) ||
              (familyName != null && familyName.trim().isNotEmpty),
@@ -35,6 +38,7 @@ class Person implements Thing {
     String? jobTitle,
     String? birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
     bool clearGivenName = false,
     bool clearFamilyName = false,
     bool clearJobTitle = false,
@@ -47,6 +51,7 @@ class Person implements Thing {
       jobTitle: clearJobTitle ? null : (jobTitle ?? this.jobTitle),
       birthDate: clearBirthDate ? null : (birthDate ?? this.birthDate),
       worksFor: worksFor ?? List.from(this.worksFor),
+      colleague: colleague ?? List.from(this.colleague),
     );
   }
 
@@ -62,6 +67,17 @@ class Person implements Thing {
       }
     }
 
+    List<String> parsedColleague = [];
+    if (json['colleague'] != null) {
+      if (json['colleague'] is List) {
+        parsedColleague = (json['colleague'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
+      } else if (json['colleague'] is Map) {
+        parsedColleague = [json['colleague']['@id'] as String];
+      }
+    }
+
     return Person(
       id: json['@id'] as String,
       givenName: json['givenName'] as String?,
@@ -69,6 +85,7 @@ class Person implements Thing {
       jobTitle: json['jobTitle'] as String?,
       birthDate: json['birthDate'] as String?,
       worksFor: parsedWorksFor,
+      colleague: parsedColleague,
     );
   }
 
@@ -84,6 +101,8 @@ class Person implements Thing {
       if (birthDate != null && birthDate!.isNotEmpty) 'birthDate': birthDate,
       if (worksFor.isNotEmpty)
         'worksFor': worksFor.map((id) => {'@id': id}).toList(),
+      if (colleague.isNotEmpty)
+        'colleague': colleague.map((id) => {'@id': id}).toList(),
     };
   }
 

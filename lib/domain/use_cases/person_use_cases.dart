@@ -34,6 +34,38 @@ Future<void> _removePersonFromOrganizations(
   }
 }
 
+Future<void> _addColleagues(
+  Repository<Thing> repository,
+  String personId,
+  Set<String> colleagueIds,
+) async {
+  if (colleagueIds.isEmpty) return;
+  final (foundPeople, _) = await repository.getByIds(colleagueIds);
+  for (final person in foundPeople.whereType<Person>()) {
+    if (!person.colleague.contains(personId)) {
+      final updatedColleague = List<String>.from(person.colleague)
+        ..add(personId);
+      await repository.setItem(person.copyWith(colleague: updatedColleague));
+    }
+  }
+}
+
+Future<void> _removeColleagues(
+  Repository<Thing> repository,
+  String personId,
+  Set<String> colleagueIds,
+) async {
+  if (colleagueIds.isEmpty) return;
+  final (foundPeople, _) = await repository.getByIds(colleagueIds);
+  for (final person in foundPeople.whereType<Person>()) {
+    if (person.colleague.contains(personId)) {
+      final updatedColleague = List<String>.from(person.colleague)
+        ..remove(personId);
+      await repository.setItem(person.copyWith(colleague: updatedColleague));
+    }
+  }
+}
+
 class CreatePersonUseCase {
   final Logger _log = Logger('CreatePersonUseCase');
   final Repository<Thing> _repository;
@@ -46,6 +78,7 @@ class CreatePersonUseCase {
     String? jobTitle,
     String? birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
   }) async {
     _log.info('Creating new person');
     final newPerson = Person(
@@ -55,15 +88,21 @@ class CreatePersonUseCase {
       jobTitle: jobTitle,
       birthDate: birthDate,
       worksFor: worksFor,
+      colleague: colleague,
     );
     final savedPerson = await _repository.setItem(newPerson);
 
-    if (savedPerson != null && worksFor != null && worksFor.isNotEmpty) {
-      await _addPersonToOrganizations(
-        _repository,
-        savedPerson.id,
-        worksFor.toSet(),
-      );
+    if (savedPerson != null) {
+      if (worksFor != null && worksFor.isNotEmpty) {
+        await _addPersonToOrganizations(
+          _repository,
+          savedPerson.id,
+          worksFor.toSet(),
+        );
+      }
+      if (colleague != null && colleague.isNotEmpty) {
+        await _addColleagues(_repository, savedPerson.id, colleague.toSet());
+      }
     }
 
     _log.fine('Person saved successfully to repository');
@@ -83,6 +122,7 @@ class EditPersonUseCase {
     String? jobTitle,
     String? birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
   }) async {
     _log.info('Editing person: ${person.id}');
     final updatedPerson = person.copyWith(
@@ -91,6 +131,7 @@ class EditPersonUseCase {
       jobTitle: jobTitle,
       birthDate: birthDate,
       worksFor: worksFor,
+      colleague: colleague,
       clearGivenName: givenName == null || givenName.trim().isEmpty,
       clearFamilyName: familyName == null || familyName.trim().isEmpty,
       clearJobTitle: jobTitle == null || jobTitle.trim().isEmpty,
@@ -114,6 +155,22 @@ class EditPersonUseCase {
       );
     }
 
+    if (colleague != null) {
+      final oldColleagues = person.colleague.toSet();
+      final newColleagues = colleague.toSet();
+
+      await _addColleagues(
+        _repository,
+        person.id,
+        newColleagues.difference(oldColleagues),
+      );
+      await _removeColleagues(
+        _repository,
+        person.id,
+        oldColleagues.difference(newColleagues),
+      );
+    }
+
     _log.fine('Person updated successfully in repository');
   }
 }
@@ -133,6 +190,10 @@ class DeletePersonUseCase {
         person.id,
         person.worksFor.toSet(),
       );
+    }
+
+    if (person.colleague.isNotEmpty) {
+      await _removeColleagues(_repository, person.id, person.colleague.toSet());
     }
 
     await _repository.delete(person.id);

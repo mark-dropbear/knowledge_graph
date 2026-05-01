@@ -5,6 +5,7 @@ import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
+import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
 
 class PersonDetailView extends StatelessWidget {
   final PeopleViewModel viewModel;
@@ -48,6 +49,11 @@ class PersonDetailView extends StatelessWidget {
               }
             })
             .whereType<Organization>()
+            .toList();
+
+        final linkedColleagues = person.colleague
+            .map((colleagueId) => graphViewModel.resolve<Person>(colleagueId))
+            .whereType<Person>()
             .toList();
 
         return Scaffold(
@@ -114,6 +120,24 @@ class PersonDetailView extends StatelessWidget {
                   (org) => OrganizationCard(
                     organization: org,
                     onTap: () => context.push('/organizations/${org.id}'),
+                  ),
+                ),
+              ],
+              if (linkedColleagues.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Colleagues',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...linkedColleagues.map(
+                  (colleague) => PersonCard(
+                    person: colleague,
+                    onTap: () => context.push(
+                      '/people/${Uri.encodeComponent(colleague.id)}',
+                    ),
                   ),
                 ),
               ],

@@ -58,6 +58,7 @@ class PeopleViewModel extends ChangeNotifier {
     String? jobTitle,
     String? birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
   }) async {
     _log.info('Adding new person');
     await _createPersonUseCase.execute(
@@ -66,6 +67,7 @@ class PeopleViewModel extends ChangeNotifier {
       jobTitle: jobTitle,
       birthDate: birthDate,
       worksFor: worksFor,
+      colleague: colleague,
     );
     await initialize();
   }
@@ -77,6 +79,7 @@ class PeopleViewModel extends ChangeNotifier {
     String? jobTitle,
     String? birthDate,
     List<String>? worksFor,
+    List<String>? colleague,
   }) async {
     _log.info('Editing person: ${person.id}');
     await _editPersonUseCase.execute(
@@ -86,6 +89,7 @@ class PeopleViewModel extends ChangeNotifier {
       jobTitle: jobTitle,
       birthDate: birthDate,
       worksFor: worksFor,
+      colleague: colleague,
     );
     await initialize();
   }
