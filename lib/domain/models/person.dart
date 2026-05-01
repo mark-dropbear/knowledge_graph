@@ -12,6 +12,7 @@ class Person implements Thing {
   final String? familyName;
   final String? jobTitle;
   final String? birthDate;
+  final List<String> worksFor;
 
   Person({
     required this.id,
@@ -19,11 +20,13 @@ class Person implements Thing {
     this.familyName,
     this.jobTitle,
     this.birthDate,
-  }) : assert(
-         (givenName != null && givenName.trim().isNotEmpty) ||
-             (familyName != null && familyName.trim().isNotEmpty),
-         'A Person must have at least a givenName or familyName.',
-       );
+    List<String>? worksFor,
+  })  : worksFor = worksFor ?? [],
+        assert(
+          (givenName != null && givenName.trim().isNotEmpty) ||
+              (familyName != null && familyName.trim().isNotEmpty),
+          'A Person must have at least a givenName or familyName.',
+        );
 
   Person copyWith({
     String? id,
@@ -31,6 +34,7 @@ class Person implements Thing {
     String? familyName,
     String? jobTitle,
     String? birthDate,
+    List<String>? worksFor,
     bool clearGivenName = false,
     bool clearFamilyName = false,
     bool clearJobTitle = false,
@@ -42,16 +46,30 @@ class Person implements Thing {
       familyName: clearFamilyName ? null : (familyName ?? this.familyName),
       jobTitle: clearJobTitle ? null : (jobTitle ?? this.jobTitle),
       birthDate: clearBirthDate ? null : (birthDate ?? this.birthDate),
+      worksFor: worksFor ?? List.from(this.worksFor),
     );
   }
 
   factory Person.fromJson(Map<String, dynamic> json) {
+    List<String> parsedWorksFor = [];
+    if (json['worksFor'] != null) {
+      if (json['worksFor'] is List) {
+        parsedWorksFor =
+            (json['worksFor'] as List)
+                .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+                .toList();
+      } else if (json['worksFor'] is Map) {
+        parsedWorksFor = [json['worksFor']['@id'] as String];
+      }
+    }
+
     return Person(
       id: json['@id'] as String,
       givenName: json['givenName'] as String?,
       familyName: json['familyName'] as String?,
       jobTitle: json['jobTitle'] as String?,
       birthDate: json['birthDate'] as String?,
+      worksFor: parsedWorksFor,
     );
   }
 
@@ -64,6 +82,8 @@ class Person implements Thing {
         'familyName': familyName,
       if (jobTitle != null && jobTitle!.isNotEmpty) 'jobTitle': jobTitle,
       if (birthDate != null && birthDate!.isNotEmpty) 'birthDate': birthDate,
+      if (worksFor.isNotEmpty)
+        'worksFor': worksFor.map((id) => {'@id': id}).toList(),
     };
   }
 

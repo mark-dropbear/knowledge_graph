@@ -31,8 +31,10 @@ class PeopleViewModel extends ChangeNotifier {
 
   Future<void> initialize() async {
     _log.info('Initializing PeopleViewModel');
-    _isLoading = true;
-    notifyListeners();
+    Future.microtask(() {
+      _isLoading = true;
+      notifyListeners();
+    });
 
     try {
       _people = await _personRepository.getItems(
@@ -49,6 +51,7 @@ class PeopleViewModel extends ChangeNotifier {
     String? familyName,
     String? jobTitle,
     String? birthDate,
+    List<String>? worksFor,
   }) async {
     _log.info('Adding new person');
     await _createPersonUseCase.execute(
@@ -56,6 +59,7 @@ class PeopleViewModel extends ChangeNotifier {
       familyName: familyName,
       jobTitle: jobTitle,
       birthDate: birthDate,
+      worksFor: worksFor,
     );
     await initialize();
   }
@@ -66,6 +70,7 @@ class PeopleViewModel extends ChangeNotifier {
     String? familyName,
     String? jobTitle,
     String? birthDate,
+    List<String>? worksFor,
   }) async {
     _log.info('Editing person: ${person.id}');
     await _editPersonUseCase.execute(
@@ -74,6 +79,7 @@ class PeopleViewModel extends ChangeNotifier {
       familyName: familyName,
       jobTitle: jobTitle,
       birthDate: birthDate,
+      worksFor: worksFor,
     );
     await initialize();
   }

@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
+import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
 
 class OrganizationDetailView extends StatelessWidget {
   final OrganizationsViewModel viewModel;
+  final PeopleViewModel peopleViewModel;
   final String organizationId;
 
   const OrganizationDetailView({
     super.key,
     required this.viewModel,
+    required this.peopleViewModel,
     required this.organizationId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: Listenable.merge([viewModel, peopleViewModel]),
       builder: (context, _) {
         Organization? organization;
         try {
@@ -29,6 +34,14 @@ class OrganizationDetailView extends StatelessWidget {
             body: const Center(child: Text('Organization not found.')),
           );
         }
+
+        final linkedPeople = organization.employee.map((personId) {
+          try {
+            return peopleViewModel.people.firstWhere((p) => p.id == personId);
+          } catch (e) {
+            return null;
+          }
+        }).whereType<Person>().toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -87,6 +100,22 @@ class OrganizationDetailView extends StatelessWidget {
               _buildDetailRow(context, 'Legal Name', organization.legalName),
               _buildDetailRow(context, 'Description', organization.description),
               _buildDetailRow(context, 'URL', organization.url),
+              if (linkedPeople.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Employees',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                ...linkedPeople.map(
+                  (person) => PersonCard(
+                    person: person,
+                    onTap: () => context.push('/people/${person.id}'),
+                  ),
+                ),
+              ],
             ],
           ),
         );

@@ -6,8 +6,11 @@
 import 'dart:async' as _i5;
 
 import 'package:data_layer/data_layer.dart' as _i2;
+import 'package:knowledge_graph/data/repositories/organization_repository.dart'
+    as _i7;
 import 'package:knowledge_graph/data/repositories/person_repository.dart'
     as _i3;
+import 'package:knowledge_graph/domain/models/organization.dart' as _i8;
 import 'package:knowledge_graph/domain/models/person.dart' as _i4;
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:mockito/src/dummies.dart' as _i6;
@@ -219,6 +222,255 @@ class MockPersonRepository extends _i1.Mock implements _i3.PersonRepository {
             ),
           )
           as _i5.Future<List<_i4.Person>>);
+
+  @override
+  _i5.Future<void> delete(String? id, {_i2.RequestDetails? details}) =>
+      (super.noSuchMethod(
+            Invocation.method(#delete, [id], {#details: details}),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> clear() =>
+      (super.noSuchMethod(
+            Invocation.method(#clear, []),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> clearForRequest(_i2.RequestDetails? details) =>
+      (super.noSuchMethod(
+            Invocation.method(#clearForRequest, [details]),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  void close() => super.noSuchMethod(
+    Invocation.method(#close, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void initialize() => super.noSuchMethod(
+    Invocation.method(#initialize, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void resetReadiness() => super.noSuchMethod(
+    Invocation.method(#resetReadiness, []),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  void markReady(dynamic obj) => super.noSuchMethod(
+    Invocation.method(#markReady, [obj]),
+    returnValueForMissingStub: null,
+  );
+}
+
+/// A class which mocks [OrganizationRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockOrganizationRepository extends _i1.Mock
+    implements _i7.OrganizationRepository {
+  @override
+  _i2.SourceList<_i8.Organization> get sourceList =>
+      (super.noSuchMethod(
+            Invocation.getter(#sourceList),
+            returnValue: _FakeSourceList_0<_i8.Organization>(
+              this,
+              Invocation.getter(#sourceList),
+            ),
+            returnValueForMissingStub: _FakeSourceList_0<_i8.Organization>(
+              this,
+              Invocation.getter(#sourceList),
+            ),
+          )
+          as _i2.SourceList<_i8.Organization>);
+
+  @override
+  DateTime Function() get getTime =>
+      (super.noSuchMethod(
+            Invocation.getter(#getTime),
+            returnValue: () =>
+                _FakeDateTime_1(this, Invocation.getter(#getTime)),
+            returnValueForMissingStub: () =>
+                _FakeDateTime_1(this, Invocation.getter(#getTime)),
+          )
+          as DateTime Function());
+
+  @override
+  _i2.Readiness get readiness =>
+      (super.noSuchMethod(
+            Invocation.getter(#readiness),
+            returnValue: _i2.Readiness.ready,
+            returnValueForMissingStub: _i2.Readiness.ready,
+          )
+          as _i2.Readiness);
+
+  @override
+  bool get isReady =>
+      (super.noSuchMethod(
+            Invocation.getter(#isReady),
+            returnValue: false,
+            returnValueForMissingStub: false,
+          )
+          as bool);
+
+  @override
+  bool get isNotReady =>
+      (super.noSuchMethod(
+            Invocation.getter(#isNotReady),
+            returnValue: false,
+            returnValueForMissingStub: false,
+          )
+          as bool);
+
+  @override
+  _i5.Future<void> get ready =>
+      (super.noSuchMethod(
+            Invocation.getter(#ready),
+            returnValue: _i5.Future<void>.value(),
+            returnValueForMissingStub: _i5.Future<void>.value(),
+          )
+          as _i5.Future<void>);
+
+  @override
+  set readiness(_i2.Readiness? value) => super.noSuchMethod(
+    Invocation.setter(#readiness, value),
+    returnValueForMissingStub: null,
+  );
+
+  @override
+  String generateOperationId() =>
+      (super.noSuchMethod(
+            Invocation.method(#generateOperationId, []),
+            returnValue: _i6.dummyValue<String>(
+              this,
+              Invocation.method(#generateOperationId, []),
+            ),
+            returnValueForMissingStub: _i6.dummyValue<String>(
+              this,
+              Invocation.method(#generateOperationId, []),
+            ),
+          )
+          as String);
+
+  @override
+  _i5.Future<_i8.Organization?> getById(
+    String? id, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getById, [id], {#details: details}),
+            returnValue: _i5.Future<_i8.Organization?>.value(),
+            returnValueForMissingStub: _i5.Future<_i8.Organization?>.value(),
+          )
+          as _i5.Future<_i8.Organization?>);
+
+  @override
+  _i5.Stream<_i8.Organization?> watch(
+    String? id, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#watch, [id], {#details: details}),
+            returnValue: _i5.Stream<_i8.Organization?>.empty(),
+            returnValueForMissingStub: _i5.Stream<_i8.Organization?>.empty(),
+          )
+          as _i5.Stream<_i8.Organization?>);
+
+  @override
+  _i5.Future<(List<_i8.Organization>, Set<String>)> getByIds(
+    Set<String>? ids, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#getByIds, [ids], {#details: details}),
+            returnValue:
+                _i5.Future<(List<_i8.Organization>, Set<String>)>.value((
+                  <_i8.Organization>[],
+                  <String>{},
+                )),
+            returnValueForMissingStub:
+                _i5.Future<(List<_i8.Organization>, Set<String>)>.value((
+                  <_i8.Organization>[],
+                  <String>{},
+                )),
+          )
+          as _i5.Future<(List<_i8.Organization>, Set<String>)>);
+
+  @override
+  _i5.Stream<(List<_i8.Organization>, Set<String>)> watchByIds(
+    Set<String>? ids, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#watchByIds, [ids], {#details: details}),
+            returnValue:
+                _i5.Stream<(List<_i8.Organization>, Set<String>)>.empty(),
+            returnValueForMissingStub:
+                _i5.Stream<(List<_i8.Organization>, Set<String>)>.empty(),
+          )
+          as _i5.Stream<(List<_i8.Organization>, Set<String>)>);
+
+  @override
+  _i5.Future<List<_i8.Organization>> getItems({_i2.RequestDetails? details}) =>
+      (super.noSuchMethod(
+            Invocation.method(#getItems, [], {#details: details}),
+            returnValue: _i5.Future<List<_i8.Organization>>.value(
+              <_i8.Organization>[],
+            ),
+            returnValueForMissingStub: _i5.Future<List<_i8.Organization>>.value(
+              <_i8.Organization>[],
+            ),
+          )
+          as _i5.Future<List<_i8.Organization>>);
+
+  @override
+  _i5.Stream<List<_i8.Organization>> watchList({_i2.RequestDetails? details}) =>
+      (super.noSuchMethod(
+            Invocation.method(#watchList, [], {#details: details}),
+            returnValue: _i5.Stream<List<_i8.Organization>>.empty(),
+            returnValueForMissingStub:
+                _i5.Stream<List<_i8.Organization>>.empty(),
+          )
+          as _i5.Stream<List<_i8.Organization>>);
+
+  @override
+  _i5.Future<_i8.Organization?> setItem(
+    _i8.Organization? item, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#setItem, [item], {#details: details}),
+            returnValue: _i5.Future<_i8.Organization?>.value(),
+            returnValueForMissingStub: _i5.Future<_i8.Organization?>.value(),
+          )
+          as _i5.Future<_i8.Organization?>);
+
+  @override
+  _i5.Future<List<_i8.Organization>> setItems(
+    Iterable<_i8.Organization>? items, {
+    _i2.RequestDetails? details,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#setItems, [items], {#details: details}),
+            returnValue: _i5.Future<List<_i8.Organization>>.value(
+              <_i8.Organization>[],
+            ),
+            returnValueForMissingStub: _i5.Future<List<_i8.Organization>>.value(
+              <_i8.Organization>[],
+            ),
+          )
+          as _i5.Future<List<_i8.Organization>>);
 
   @override
   _i5.Future<void> delete(String? id, {_i2.RequestDetails? details}) =>

@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/resource_selection_modal.dart';
 
 class OrganizationFormView extends StatefulWidget {
   final OrganizationsViewModel viewModel;
+  final PeopleViewModel peopleViewModel;
   final String? organizationId;
 
   const OrganizationFormView({
     super.key,
     required this.viewModel,
+    required this.peopleViewModel,
     this.organizationId,
   });
 
@@ -23,6 +27,7 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _urlController;
   OrganizationType _selectedType = OrganizationType.organization;
+  List<String> _selectedEmployees = [];
   Organization? _existingOrganization;
 
   @override
@@ -48,6 +53,7 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
     _urlController = TextEditingController(text: _existingOrganization?.url);
     _selectedType =
         _existingOrganization?.orgType ?? OrganizationType.organization;
+    _selectedEmployees = List.from(_existingOrganization?.employee ?? []);
   }
 
   @override
@@ -76,6 +82,7 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
         legalName: legalName.isEmpty ? null : legalName,
         description: description.isEmpty ? null : description,
         url: url.isEmpty ? null : url,
+        employee: _selectedEmployees,
       );
     } else {
       await widget.viewModel.editOrganization(
@@ -85,12 +92,37 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
         legalName: legalName.isEmpty ? null : legalName,
         description: description.isEmpty ? null : description,
         url: url.isEmpty ? null : url,
+        employee: _selectedEmployees,
       );
     }
 
     if (mounted) {
       context.pop();
     }
+  }
+
+  Future<void> _selectEmployees() async {
+    await ResourceSelectionModal.show(
+      context: context,
+      title: 'Select Employees',
+      initialSelectedIds: _selectedEmployees,
+      fetchItems: () async {
+        await widget.peopleViewModel.initialize();
+        return Map.fromEntries(
+          widget.peopleViewModel.people.map(
+            (p) => MapEntry(
+              p.id,
+              '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
+            ),
+          ),
+        );
+      },
+      onSelectionSaved: (selectedIds) {
+        setState(() {
+          _selectedEmployees = selectedIds;
+        });
+      },
+    );
   }
 
   @override
@@ -169,6 +201,17 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.url,
+            ),
+            const SizedBox(height: 24),
+            Text('Employees', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('${_selectedEmployees.length} people selected'),
+              trailing: FilledButton.tonal(
+                onPressed: _selectEmployees,
+                child: const Text('Edit Links'),
+              ),
             ),
           ],
         ),

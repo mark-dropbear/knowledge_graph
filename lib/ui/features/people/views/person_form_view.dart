@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/resource_selection_modal.dart';
 
 class PersonFormView extends StatefulWidget {
   final PeopleViewModel viewModel;
+  final OrganizationsViewModel organizationsViewModel;
   final String? personId;
 
-  const PersonFormView({super.key, required this.viewModel, this.personId});
+  const PersonFormView({
+    super.key,
+    required this.viewModel,
+    required this.organizationsViewModel,
+    this.personId,
+  });
 
   @override
   State<PersonFormView> createState() => _PersonFormViewState();
@@ -18,6 +26,7 @@ class _PersonFormViewState extends State<PersonFormView> {
   late final TextEditingController _familyNameController;
   late final TextEditingController _jobTitleController;
   late final TextEditingController _birthDateController;
+  List<String> _selectedWorksFor = [];
   Person? _existingPerson;
 
   @override
@@ -29,7 +38,6 @@ class _PersonFormViewState extends State<PersonFormView> {
           (p) => p.id == widget.personId,
         );
       } catch (e) {
-        // Person not found, maybe deleted or invalid ID
         _existingPerson = null;
       }
     }
@@ -46,6 +54,7 @@ class _PersonFormViewState extends State<PersonFormView> {
     _birthDateController = TextEditingController(
       text: _existingPerson?.birthDate,
     );
+    _selectedWorksFor = List.from(_existingPerson?.worksFor ?? []);
   }
 
   @override
@@ -75,6 +84,7 @@ class _PersonFormViewState extends State<PersonFormView> {
         familyName: familyName.isEmpty ? null : familyName,
         jobTitle: jobTitle.isEmpty ? null : jobTitle,
         birthDate: birthDateStr.isEmpty ? null : birthDateStr,
+        worksFor: _selectedWorksFor,
       );
     } else {
       await widget.viewModel.editPerson(
@@ -83,12 +93,34 @@ class _PersonFormViewState extends State<PersonFormView> {
         familyName: familyName.isEmpty ? null : familyName,
         jobTitle: jobTitle.isEmpty ? null : jobTitle,
         birthDate: birthDateStr.isEmpty ? null : birthDateStr,
+        worksFor: _selectedWorksFor,
       );
     }
 
     if (mounted) {
       context.pop();
     }
+  }
+
+  Future<void> _selectOrganizations() async {
+    await ResourceSelectionModal.show(
+      context: context,
+      title: 'Select Organizations',
+      initialSelectedIds: _selectedWorksFor,
+      fetchItems: () async {
+        await widget.organizationsViewModel.initialize();
+        return Map.fromEntries(
+          widget.organizationsViewModel.organizations.map(
+            (o) => MapEntry(o.id, o.name),
+          ),
+        );
+      },
+      onSelectionSaved: (selectedIds) {
+        setState(() {
+          _selectedWorksFor = selectedIds;
+        });
+      },
+    );
   }
 
   @override
@@ -142,6 +174,17 @@ class _PersonFormViewState extends State<PersonFormView> {
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.datetime,
+            ),
+            const SizedBox(height: 24),
+            Text('Works For', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('${_selectedWorksFor.length} organizations selected'),
+              trailing: FilledButton.tonal(
+                onPressed: _selectOrganizations,
+                child: const Text('Edit Links'),
+              ),
             ),
           ],
         ),

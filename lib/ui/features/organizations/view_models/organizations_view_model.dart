@@ -31,8 +31,10 @@ class OrganizationsViewModel extends ChangeNotifier {
 
   Future<void> initialize() async {
     _log.info('Initializing OrganizationsViewModel');
-    _isLoading = true;
-    notifyListeners();
+    Future.microtask(() {
+      _isLoading = true;
+      notifyListeners();
+    });
 
     try {
       _organizations = await _organizationRepository.getItems(
@@ -50,6 +52,7 @@ class OrganizationsViewModel extends ChangeNotifier {
     String? legalName,
     String? description,
     String? url,
+    List<String>? employee,
   }) async {
     _log.info('Adding new organization');
     await _createOrganizationUseCase.execute(
@@ -58,6 +61,7 @@ class OrganizationsViewModel extends ChangeNotifier {
       legalName: legalName,
       description: description,
       url: url,
+      employee: employee,
     );
     await initialize();
   }
@@ -69,6 +73,7 @@ class OrganizationsViewModel extends ChangeNotifier {
     String? legalName,
     String? description,
     String? url,
+    List<String>? employee,
   }) async {
     _log.info('Editing organization: ${organization.id}');
     await _editOrganizationUseCase.execute(
@@ -78,6 +83,7 @@ class OrganizationsViewModel extends ChangeNotifier {
       legalName: legalName,
       description: description,
       url: url,
+      employee: employee,
     );
     await initialize();
   }

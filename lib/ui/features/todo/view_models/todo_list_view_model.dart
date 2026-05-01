@@ -40,8 +40,10 @@ class TodoListViewModel extends ChangeNotifier {
 
   Future<void> initialize(String listId) async {
     _log.info('Initializing ViewModel for list: $listId');
-    _isLoading = true;
-    notifyListeners();
+    Future.microtask(() {
+      _isLoading = true;
+      notifyListeners();
+    });
 
     try {
       _currentList = await _taskListRepository.getById(listId);

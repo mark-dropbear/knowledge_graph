@@ -35,8 +35,10 @@ class TaskListsViewModel extends ChangeNotifier {
 
   Future<void> initialize() async {
     _log.info('Initializing TaskListsViewModel');
-    _isLoading = true;
-    notifyListeners();
+    Future.microtask(() {
+      _isLoading = true;
+      notifyListeners();
+    });
 
     try {
       _lists = await _taskListRepository.getItems(

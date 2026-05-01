@@ -63,13 +63,22 @@ void main() {
     organizationRepo,
   );
 
-  final createPersonUseCase = CreatePersonUseCase(personRepo);
-  final editPersonUseCase = EditPersonUseCase(personRepo);
-  final deletePersonUseCase = DeletePersonUseCase(personRepo);
+  final createPersonUseCase = CreatePersonUseCase(personRepo, organizationRepo);
+  final editPersonUseCase = EditPersonUseCase(personRepo, organizationRepo);
+  final deletePersonUseCase = DeletePersonUseCase(personRepo, organizationRepo);
 
-  final createOrganizationUseCase = CreateOrganizationUseCase(organizationRepo);
-  final editOrganizationUseCase = EditOrganizationUseCase(organizationRepo);
-  final deleteOrganizationUseCase = DeleteOrganizationUseCase(organizationRepo);
+  final createOrganizationUseCase = CreateOrganizationUseCase(
+    organizationRepo,
+    personRepo,
+  );
+  final editOrganizationUseCase = EditOrganizationUseCase(
+    organizationRepo,
+    personRepo,
+  );
+  final deleteOrganizationUseCase = DeleteOrganizationUseCase(
+    organizationRepo,
+    personRepo,
+  );
 
   // 3. Initialize ViewModels (Singletons)
   final taskListsViewModel = TaskListsViewModel(
@@ -128,8 +137,10 @@ void main() {
             routes: [
               GoRoute(
                 path: 'create',
-                builder: (context, state) =>
-                    PersonFormView(viewModel: peopleViewModel),
+                builder: (context, state) => PersonFormView(
+                  viewModel: peopleViewModel,
+                  organizationsViewModel: organizationsViewModel,
+                ),
               ),
               GoRoute(
                 path: ':id',
@@ -137,6 +148,7 @@ void main() {
                   final id = state.pathParameters['id']!;
                   return PersonDetailView(
                     viewModel: peopleViewModel,
+                    organizationsViewModel: organizationsViewModel,
                     personId: id,
                   );
                 },
@@ -147,6 +159,7 @@ void main() {
                       final id = state.pathParameters['id']!;
                       return PersonFormView(
                         viewModel: peopleViewModel,
+                        organizationsViewModel: organizationsViewModel,
                         personId: id,
                       );
                     },
@@ -162,8 +175,10 @@ void main() {
             routes: [
               GoRoute(
                 path: 'create',
-                builder: (context, state) =>
-                    OrganizationFormView(viewModel: organizationsViewModel),
+                builder: (context, state) => OrganizationFormView(
+                  viewModel: organizationsViewModel,
+                  peopleViewModel: peopleViewModel,
+                ),
               ),
               GoRoute(
                 path: ':id',
@@ -171,6 +186,7 @@ void main() {
                   final id = state.pathParameters['id']!;
                   return OrganizationDetailView(
                     viewModel: organizationsViewModel,
+                    peopleViewModel: peopleViewModel,
                     organizationId: id,
                   );
                 },
@@ -181,6 +197,7 @@ void main() {
                       final id = state.pathParameters['id']!;
                       return OrganizationFormView(
                         viewModel: organizationsViewModel,
+                        peopleViewModel: peopleViewModel,
                         organizationId: id,
                       );
                     },

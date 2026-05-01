@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
 
 class PersonDetailView extends StatelessWidget {
   final PeopleViewModel viewModel;
+  final OrganizationsViewModel organizationsViewModel;
   final String personId;
 
   const PersonDetailView({
     super.key,
     required this.viewModel,
+    required this.organizationsViewModel,
     required this.personId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: viewModel,
+      listenable: Listenable.merge([viewModel, organizationsViewModel]),
       builder: (context, _) {
         Person? person;
         try {
@@ -32,6 +37,14 @@ class PersonDetailView extends StatelessWidget {
           person.givenName,
           person.familyName,
         ].whereType<String>().join(' ');
+
+        final linkedOrgs = person.worksFor.map((orgId) {
+          try {
+            return organizationsViewModel.organizations.firstWhere((o) => o.id == orgId);
+          } catch (e) {
+            return null;
+          }
+        }).whereType<Organization>().toList();
 
         return Scaffold(
           appBar: AppBar(
@@ -88,6 +101,22 @@ class PersonDetailView extends StatelessWidget {
                 'Birth Date',
                 person.birthDate,
               ),
+              if (linkedOrgs.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Works For',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Theme.of(context).colorScheme.primary,
+                      ),
+                ),
+                const SizedBox(height: 8),
+                ...linkedOrgs.map(
+                  (org) => OrganizationCard(
+                    organization: org,
+                    onTap: () => context.push('/organizations/${org.id}'),
+                  ),
+                ),
+              ],
             ],
           ),
         );

@@ -49,6 +49,7 @@ class Organization implements Thing {
   final String? legalName;
   final String? description;
   final String? url;
+  final List<String> employee;
 
   Organization({
     required this.id,
@@ -57,7 +58,8 @@ class Organization implements Thing {
     this.legalName,
     this.description,
     this.url,
-  }) {
+    List<String>? employee,
+  }) : employee = employee ?? [] {
     if (name.trim().isEmpty) {
       throw ArgumentError('An Organization must have a name.');
     }
@@ -70,6 +72,7 @@ class Organization implements Thing {
     String? legalName,
     String? description,
     String? url,
+    List<String>? employee,
     bool clearLegalName = false,
     bool clearDescription = false,
     bool clearUrl = false,
@@ -81,10 +84,23 @@ class Organization implements Thing {
       legalName: clearLegalName ? null : (legalName ?? this.legalName),
       description: clearDescription ? null : (description ?? this.description),
       url: clearUrl ? null : (url ?? this.url),
+      employee: employee ?? List.from(this.employee),
     );
   }
 
   factory Organization.fromJson(Map<String, dynamic> json) {
+    List<String> parsedEmployee = [];
+    if (json['employee'] != null) {
+      if (json['employee'] is List) {
+        parsedEmployee =
+            (json['employee'] as List)
+                .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+                .toList();
+      } else if (json['employee'] is Map) {
+        parsedEmployee = [json['employee']['@id'] as String];
+      }
+    }
+
     return Organization(
       id: json['@id'] as String,
       orgType: OrganizationType.fromSchemaString(
@@ -94,6 +110,7 @@ class Organization implements Thing {
       legalName: json['legalName'] as String?,
       description: json['description'] as String?,
       url: json['url'] as String?,
+      employee: parsedEmployee,
     );
   }
 
@@ -106,6 +123,8 @@ class Organization implements Thing {
       if (description != null && description!.isNotEmpty)
         'description': description,
       if (url != null && url!.isNotEmpty) 'url': url,
+      if (employee.isNotEmpty)
+        'employee': employee.map((id) => {'@id': id}).toList(),
     };
   }
 

@@ -3,21 +3,27 @@ import 'package:mockito/mockito.dart';
 import 'package:mockito/annotations.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/data/repositories/person_repository.dart';
+import 'package:knowledge_graph/data/repositories/organization_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 
-@GenerateNiceMocks([MockSpec<PersonRepository>()])
+@GenerateNiceMocks([
+  MockSpec<PersonRepository>(),
+  MockSpec<OrganizationRepository>(),
+])
 import 'person_use_cases_test.mocks.dart';
 
 void main() {
   group('Person Use Cases', () {
     late MockPersonRepository mockPersonRepo;
+    late MockOrganizationRepository mockOrganizationRepo;
 
     setUp(() {
       mockPersonRepo = MockPersonRepository();
+      mockOrganizationRepo = MockOrganizationRepository();
     });
 
     test('CreatePersonUseCase saves new person', () async {
-      final useCase = CreatePersonUseCase(mockPersonRepo);
+      final useCase = CreatePersonUseCase(mockPersonRepo, mockOrganizationRepo);
 
       await useCase.execute(
         givenName: 'John',
@@ -35,7 +41,7 @@ void main() {
     });
 
     test('EditPersonUseCase updates person fields', () async {
-      final useCase = EditPersonUseCase(mockPersonRepo);
+      final useCase = EditPersonUseCase(mockPersonRepo, mockOrganizationRepo);
       final initialPerson = Person(
         id: 'urn:uuid:123',
         givenName: 'John',
@@ -56,7 +62,7 @@ void main() {
     });
 
     test('DeletePersonUseCase deletes person', () async {
-      final useCase = DeletePersonUseCase(mockPersonRepo);
+      final useCase = DeletePersonUseCase(mockPersonRepo, mockOrganizationRepo);
       final person = Person(id: 'urn:uuid:123', givenName: 'John');
 
       await useCase.execute(person);
