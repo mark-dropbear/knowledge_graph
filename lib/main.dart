@@ -144,8 +144,7 @@ void main() {
                   final listId = state.pathParameters['id']!;
                   return TaskFormView(
                     viewModel: todoListViewModel,
-                    peopleViewModel: peopleViewModel,
-                    organizationsViewModel: organizationsViewModel,
+                    graphViewModel: graphViewModel,
                     listId: listId,
                   );
                 },
@@ -170,8 +169,7 @@ void main() {
                       final taskId = state.pathParameters['taskId']!;
                       return TaskFormView(
                         viewModel: todoListViewModel,
-                        peopleViewModel: peopleViewModel,
-                        organizationsViewModel: organizationsViewModel,
+                        graphViewModel: graphViewModel,
                         listId: listId,
                         taskId: taskId,
                       );

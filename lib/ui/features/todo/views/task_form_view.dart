@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
+import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
-import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
-import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/multi_type_resource_selection_modal.dart';
 
 class TaskFormView extends StatefulWidget {
   final TodoListViewModel viewModel;
-  final PeopleViewModel peopleViewModel;
-  final OrganizationsViewModel organizationsViewModel;
+  final GraphViewModel graphViewModel;
   final String listId;
   final String? taskId;
 
   const TaskFormView({
     super.key,
     required this.viewModel,
-    required this.peopleViewModel,
-    required this.organizationsViewModel,
+    required this.graphViewModel,
     required this.listId,
     this.taskId,
   });
@@ -96,9 +95,10 @@ class _TaskFormViewState extends State<TaskFormView> {
         ResourceTab(
           label: 'People',
           fetchItems: () async {
-            await widget.peopleViewModel.initialize();
+            // Read from the unified graph!
+            final people = widget.graphViewModel.getItems<Person>();
             return Map.fromEntries(
-              widget.peopleViewModel.people.map(
+              people.map(
                 (p) => MapEntry(
                   p.id,
                   '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
@@ -110,11 +110,11 @@ class _TaskFormViewState extends State<TaskFormView> {
         ResourceTab(
           label: 'Organizations',
           fetchItems: () async {
-            await widget.organizationsViewModel.initialize();
+            // Read from the unified graph!
+            final organizations = widget.graphViewModel
+                .getItems<Organization>();
             return Map.fromEntries(
-              widget.organizationsViewModel.organizations.map(
-                (o) => MapEntry(o.id, o.name),
-              ),
+              organizations.map((o) => MapEntry(o.id, o.name)),
             );
           },
         ),

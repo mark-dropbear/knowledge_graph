@@ -31,6 +31,11 @@ class GraphViewModel extends ChangeNotifier {
     return null;
   }
 
+  /// Returns a list of all resources of a specific type [T].
+  List<T> getItems<T extends Thing>() {
+    return _resources.values.whereType<T>().toList();
+  }
+
   /// Helper to clear the graph if needed
   void clear() {
     if (_resources.isNotEmpty) {
