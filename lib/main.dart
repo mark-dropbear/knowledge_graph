@@ -12,6 +12,8 @@ import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_mode
 import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_lists_view.dart';
+import 'package:knowledge_graph/ui/features/todo/views/task_detail_view.dart';
+import 'package:knowledge_graph/ui/features/todo/views/task_form_view.dart';
 import 'package:knowledge_graph/ui/layout/main_layout.dart';
 import 'package:knowledge_graph/data/repositories/person_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
@@ -130,6 +132,44 @@ void main() {
               final listId = state.pathParameters['id']!;
               return TodoListView(listId: listId, viewModel: todoListViewModel);
             },
+            routes: [
+              GoRoute(
+                path: 'tasks/create',
+                builder: (context, state) {
+                  final listId = state.pathParameters['id']!;
+                  return TaskFormView(
+                    viewModel: todoListViewModel,
+                    listId: listId,
+                  );
+                },
+              ),
+              GoRoute(
+                path: 'tasks/:taskId',
+                builder: (context, state) {
+                  final listId = state.pathParameters['id']!;
+                  final taskId = state.pathParameters['taskId']!;
+                  return TaskDetailView(
+                    viewModel: todoListViewModel,
+                    listId: listId,
+                    taskId: taskId,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) {
+                      final listId = state.pathParameters['id']!;
+                      final taskId = state.pathParameters['taskId']!;
+                      return TaskFormView(
+                        viewModel: todoListViewModel,
+                        listId: listId,
+                        taskId: taskId,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
           ),
           GoRoute(
             path: '/people',

@@ -9,7 +9,7 @@ import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_mode
 import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 
 void main() {
-  testWidgets('TodoListView add, toggle, and remove task', (
+  testWidgets('TodoListView toggle and remove task', (
     WidgetTester tester,
   ) async {
     // 1. Initialize real Repositories and UseCases for an integrated widget test
@@ -24,6 +24,9 @@ void main() {
     // Pre-seed a default list for testing
     final testList = TaskList(id: 'urn:uuid:test-list', name: 'Test Tasks');
     await taskListRepo.setItem(testList);
+    
+    // Pre-seed a task for testing toggle and dismiss
+    await createTaskUseCase.execute(testList, 'Buy groceries');
 
     final viewModel = TodoListViewModel(
       taskListRepository: taskListRepo,
@@ -42,23 +45,6 @@ void main() {
     );
 
     // Allow initial data to load
-    await tester.pumpAndSettle();
-
-    // Verify initial state
-    expect(find.text('Test Tasks'), findsOneWidget); // Appbar title
-    expect(find.byType(ListTile), findsNothing);
-
-    // 3. Tap the FAB to open the modal
-    await tester.tap(find.byType(FloatingActionButton));
-    await tester.pumpAndSettle();
-
-    // 4. Enter text into the Name TextField
-    await tester.enterText(find.byType(TextField).first, 'Buy groceries');
-
-    // 5. Tap the Create/Add button
-    await tester.tap(find.widgetWithText(ElevatedButton, 'Add Task'));
-
-    // 6. Rebuild the widget to reflect the new state (adding task is async and modal closes)
     await tester.pumpAndSettle();
 
     // 7. Verify the item was added
