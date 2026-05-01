@@ -12,6 +12,8 @@ class MainLayout extends StatelessWidget {
       return 1;
     } else if (location.startsWith('/organizations')) {
       return 2;
+    } else if (location.startsWith('/things')) {
+      return 3;
     }
     return 0;
   }
@@ -30,6 +32,8 @@ class MainLayout extends StatelessWidget {
                 context.go('/people');
               } else if (index == 2) {
                 context.go('/organizations');
+              } else if (index == 3) {
+                context.go('/things');
               }
             },
             labelType: NavigationRailLabelType.all,
@@ -48,6 +52,11 @@ class MainLayout extends StatelessWidget {
                 icon: Icon(Icons.business),
                 selectedIcon: Icon(Icons.business),
                 label: Text('Orgs'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.category),
+                selectedIcon: Icon(Icons.category),
+                label: Text('Things'),
               ),
             ],
           ),

@@ -5,6 +5,7 @@ import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
+import 'package:knowledge_graph/domain/models/thing_instance.dart';
 
 class GraphRepository extends Repository<Thing> {
   GraphRepository()
@@ -27,6 +28,8 @@ class GraphRepository extends Repository<Thing> {
           return Task.fromJson(json);
         case 'ItemList':
           return TaskList.fromJson(json);
+        case 'Thing':
+          return ThingInstance.fromJson(json);
         default:
           throw Exception('GraphRepository: Unknown type: $type');
       }
@@ -36,6 +39,7 @@ class GraphRepository extends Repository<Thing> {
       if (thing is Organization) return thing.toJson();
       if (thing is Task) return thing.toJson();
       if (thing is TaskList) return thing.toJson();
+      if (thing is ThingInstance) return thing.toJson();
       throw Exception('GraphRepository: Cannot serialize ${thing.runtimeType}');
     },
     getId: (thing) => thing.id.isEmpty ? null : thing.id,
@@ -47,6 +51,7 @@ class GraphRepository extends Repository<Thing> {
       if (thing is Organization) return thing.copyWith(id: newId);
       if (thing is Task) return thing.copyWith(id: newId);
       if (thing is TaskList) return thing.copyWith(id: newId);
+      if (thing is ThingInstance) return thing.copyWith(id: newId);
 
       return thing; // Fallback
     },

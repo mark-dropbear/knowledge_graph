@@ -25,6 +25,11 @@ import 'package:knowledge_graph/ui/features/people/views/person_form_view.dart';
 import 'package:knowledge_graph/ui/features/people/views/person_detail_view.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organization_form_view.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organization_detail_view.dart';
+import 'package:knowledge_graph/domain/use_cases/thing_instance_use_cases.dart';
+import 'package:knowledge_graph/ui/features/things/view_models/things_view_model.dart';
+import 'package:knowledge_graph/ui/features/things/views/things_view.dart';
+import 'package:knowledge_graph/ui/features/things/views/thing_form_view.dart';
+import 'package:knowledge_graph/ui/features/things/views/thing_detail_view.dart';
 
 void _setupLogging() {
   Logger.root.level = Level.ALL;
@@ -63,6 +68,10 @@ void main() {
   final editOrganizationUseCase = EditOrganizationUseCase(graphRepo);
   final deleteOrganizationUseCase = DeleteOrganizationUseCase(graphRepo);
 
+  final createThingInstanceUseCase = CreateThingInstanceUseCase(graphRepo);
+  final editThingInstanceUseCase = EditThingInstanceUseCase(graphRepo);
+  final deleteThingInstanceUseCase = DeleteThingInstanceUseCase(graphRepo);
+
   // 3. Initialize ViewModels (Singletons)
   final graphViewModel = GraphViewModel();
 
@@ -97,6 +106,13 @@ void main() {
     editOrganizationUseCase: editOrganizationUseCase,
     deleteOrganizationUseCase: deleteOrganizationUseCase,
     graphViewModel: graphViewModel,
+  );
+
+  final thingsViewModel = ThingsViewModel(
+    repository: graphRepo,
+    createThingInstanceUseCase: createThingInstanceUseCase,
+    editThingInstanceUseCase: editThingInstanceUseCase,
+    deleteThingInstanceUseCase: deleteThingInstanceUseCase,
   );
 
   // 4. Configure GoRouter
@@ -227,6 +243,40 @@ void main() {
                         viewModel: organizationsViewModel,
                         graphViewModel: graphViewModel,
                         organizationId: id,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          GoRoute(
+            path: '/things',
+            builder: (context, state) => ThingsView(viewModel: thingsViewModel),
+            routes: [
+              GoRoute(
+                path: 'add',
+                builder: (context, state) =>
+                    ThingFormView(viewModel: thingsViewModel),
+              ),
+              GoRoute(
+                path: ':id',
+                builder: (context, state) {
+                  final id = state.pathParameters['id']!;
+                  return ThingDetailView(
+                    viewModel: thingsViewModel,
+                    graphViewModel: graphViewModel,
+                    thingId: id,
+                  );
+                },
+                routes: [
+                  GoRoute(
+                    path: 'edit',
+                    builder: (context, state) {
+                      final id = state.pathParameters['id']!;
+                      return ThingFormView(
+                        viewModel: thingsViewModel,
+                        thingId: id,
                       );
                     },
                   ),
