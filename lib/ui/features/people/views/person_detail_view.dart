@@ -3,25 +3,25 @@ import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
-import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
 
 class PersonDetailView extends StatelessWidget {
   final PeopleViewModel viewModel;
-  final OrganizationsViewModel organizationsViewModel;
+  final GraphViewModel graphViewModel;
   final String personId;
 
   const PersonDetailView({
     super.key,
     required this.viewModel,
-    required this.organizationsViewModel,
+    required this.graphViewModel,
     required this.personId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([viewModel, organizationsViewModel]),
+      listenable: Listenable.merge([viewModel, graphViewModel]),
       builder: (context, _) {
         Person? person;
         try {
@@ -38,12 +38,11 @@ class PersonDetailView extends StatelessWidget {
           person.familyName,
         ].whereType<String>().join(' ');
 
+        final allOrgs = graphViewModel.getItems<Organization>();
         final linkedOrgs = person.worksFor
             .map((orgId) {
               try {
-                return organizationsViewModel.organizations.firstWhere(
-                  (o) => o.id == orgId,
-                );
+                return allOrgs.firstWhere((o) => o.id == orgId);
               } catch (e) {
                 return null;
               }

@@ -3,25 +3,25 @@ import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
-import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
 
 class OrganizationDetailView extends StatelessWidget {
   final OrganizationsViewModel viewModel;
-  final PeopleViewModel peopleViewModel;
+  final GraphViewModel graphViewModel;
   final String organizationId;
 
   const OrganizationDetailView({
     super.key,
     required this.viewModel,
-    required this.peopleViewModel,
+    required this.graphViewModel,
     required this.organizationId,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([viewModel, peopleViewModel]),
+      listenable: Listenable.merge([viewModel, graphViewModel]),
       builder: (context, _) {
         Organization? organization;
         try {
@@ -35,12 +35,11 @@ class OrganizationDetailView extends StatelessWidget {
           );
         }
 
+        final allPeople = graphViewModel.getItems<Person>();
         final linkedPeople = organization.employee
             .map((personId) {
               try {
-                return peopleViewModel.people.firstWhere(
-                  (p) => p.id == personId,
-                );
+                return allPeople.firstWhere((p) => p.id == personId);
               } catch (e) {
                 return null;
               }

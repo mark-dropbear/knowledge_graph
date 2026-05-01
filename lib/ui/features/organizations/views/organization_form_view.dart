@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
-import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
-import 'package:knowledge_graph/ui/shared/widgets/resource_selection_modal.dart';
+import 'package:knowledge_graph/domain/models/person.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/multi_type_resource_selection_modal.dart';
 
 class OrganizationFormView extends StatefulWidget {
   final OrganizationsViewModel viewModel;
-  final PeopleViewModel peopleViewModel;
+  final GraphViewModel graphViewModel;
   final String? organizationId;
 
   const OrganizationFormView({
     super.key,
     required this.viewModel,
-    required this.peopleViewModel,
+    required this.graphViewModel,
     this.organizationId,
   });
 
@@ -102,21 +103,26 @@ class _OrganizationFormViewState extends State<OrganizationFormView> {
   }
 
   Future<void> _selectEmployees() async {
-    await ResourceSelectionModal.show(
+    await MultiTypeResourceSelectionModal.show(
       context: context,
       title: 'Select Employees',
       initialSelectedIds: _selectedEmployees,
-      fetchItems: () async {
-        await widget.peopleViewModel.initialize();
-        return Map.fromEntries(
-          widget.peopleViewModel.people.map(
-            (p) => MapEntry(
-              p.id,
-              '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
-            ),
-          ),
-        );
-      },
+      tabs: [
+        ResourceTab(
+          label: 'People',
+          fetchItems: () async {
+            final people = widget.graphViewModel.getItems<Person>();
+            return Map.fromEntries(
+              people.map(
+                (p) => MapEntry(
+                  p.id,
+                  '${p.givenName ?? ''} ${p.familyName ?? ''}'.trim(),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
       onSelectionSaved: (selectedIds) {
         setState(() {
           _selectedEmployees = selectedIds;

@@ -167,7 +167,7 @@ void main() {
                 path: 'create',
                 builder: (context, state) => PersonFormView(
                   viewModel: peopleViewModel,
-                  organizationsViewModel: organizationsViewModel,
+                  graphViewModel: graphViewModel,
                 ),
               ),
               GoRoute(
@@ -176,7 +176,7 @@ void main() {
                   final id = state.pathParameters['id']!;
                   return PersonDetailView(
                     viewModel: peopleViewModel,
-                    organizationsViewModel: organizationsViewModel,
+                    graphViewModel: graphViewModel,
                     personId: id,
                   );
                 },
@@ -187,7 +187,7 @@ void main() {
                       final id = state.pathParameters['id']!;
                       return PersonFormView(
                         viewModel: peopleViewModel,
-                        organizationsViewModel: organizationsViewModel,
+                        graphViewModel: graphViewModel,
                         personId: id,
                       );
                     },
@@ -205,7 +205,7 @@ void main() {
                 path: 'create',
                 builder: (context, state) => OrganizationFormView(
                   viewModel: organizationsViewModel,
-                  peopleViewModel: peopleViewModel,
+                  graphViewModel: graphViewModel,
                 ),
               ),
               GoRoute(
@@ -214,7 +214,7 @@ void main() {
                   final id = state.pathParameters['id']!;
                   return OrganizationDetailView(
                     viewModel: organizationsViewModel,
-                    peopleViewModel: peopleViewModel,
+                    graphViewModel: graphViewModel,
                     organizationId: id,
                   );
                 },
@@ -225,7 +225,7 @@ void main() {
                       final id = state.pathParameters['id']!;
                       return OrganizationFormView(
                         viewModel: organizationsViewModel,
-                        peopleViewModel: peopleViewModel,
+                        graphViewModel: graphViewModel,
                         organizationId: id,
                       );
                     },

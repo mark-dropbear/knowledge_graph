@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
-import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
-import 'package:knowledge_graph/ui/shared/widgets/resource_selection_modal.dart';
+import 'package:knowledge_graph/domain/models/organization.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
+import 'package:knowledge_graph/ui/shared/widgets/multi_type_resource_selection_modal.dart';
 
 class PersonFormView extends StatefulWidget {
   final PeopleViewModel viewModel;
-  final OrganizationsViewModel organizationsViewModel;
+  final GraphViewModel graphViewModel;
   final String? personId;
 
   const PersonFormView({
     super.key,
     required this.viewModel,
-    required this.organizationsViewModel,
+    required this.graphViewModel,
     this.personId,
   });
 
@@ -103,18 +104,22 @@ class _PersonFormViewState extends State<PersonFormView> {
   }
 
   Future<void> _selectOrganizations() async {
-    await ResourceSelectionModal.show(
+    await MultiTypeResourceSelectionModal.show(
       context: context,
       title: 'Select Organizations',
       initialSelectedIds: _selectedWorksFor,
-      fetchItems: () async {
-        await widget.organizationsViewModel.initialize();
-        return Map.fromEntries(
-          widget.organizationsViewModel.organizations.map(
-            (o) => MapEntry(o.id, o.name),
-          ),
-        );
-      },
+      tabs: [
+        ResourceTab(
+          label: 'Organizations',
+          fetchItems: () async {
+            final organizations = widget.graphViewModel
+                .getItems<Organization>();
+            return Map.fromEntries(
+              organizations.map((o) => MapEntry(o.id, o.name)),
+            );
+          },
+        ),
+      ],
       onSelectionSaved: (selectedIds) {
         setState(() {
           _selectedWorksFor = selectedIds;
