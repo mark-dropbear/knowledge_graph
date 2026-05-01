@@ -4,23 +4,20 @@ import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
-import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
-import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
 import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
 
 class TaskDetailView extends StatelessWidget {
   final TodoListViewModel viewModel;
-  final PeopleViewModel peopleViewModel;
-  final OrganizationsViewModel organizationsViewModel;
+  final GraphViewModel graphViewModel;
   final String listId;
   final String taskId;
 
   const TaskDetailView({
     super.key,
     required this.viewModel,
-    required this.peopleViewModel,
-    required this.organizationsViewModel,
+    required this.graphViewModel,
     required this.listId,
     required this.taskId,
   });
@@ -28,11 +25,7 @@ class TaskDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([
-        viewModel,
-        peopleViewModel,
-        organizationsViewModel,
-      ]),
+      listenable: Listenable.merge([viewModel, graphViewModel]),
       builder: (context, _) {
         Task? task;
         try {
@@ -45,28 +38,12 @@ class TaskDetailView extends StatelessWidget {
         }
 
         final linkedPeople = task.agent
-            .map((agentId) {
-              try {
-                return peopleViewModel.people.firstWhere(
-                  (p) => p.id == agentId,
-                );
-              } catch (_) {
-                return null;
-              }
-            })
+            .map((agentId) => graphViewModel.resolve<Person>(agentId))
             .whereType<Person>()
             .toList();
 
         final linkedOrganizations = task.agent
-            .map((agentId) {
-              try {
-                return organizationsViewModel.organizations.firstWhere(
-                  (o) => o.id == agentId,
-                );
-              } catch (_) {
-                return null;
-              }
-            })
+            .map((agentId) => graphViewModel.resolve<Organization>(agentId))
             .whereType<Organization>()
             .toList();
 

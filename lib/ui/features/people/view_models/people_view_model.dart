@@ -4,6 +4,7 @@ import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/data/repositories/person_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 
 class PeopleViewModel extends ChangeNotifier {
   static final _log = Logger('PeopleViewModel');
@@ -12,16 +13,19 @@ class PeopleViewModel extends ChangeNotifier {
   final CreatePersonUseCase _createPersonUseCase;
   final EditPersonUseCase _editPersonUseCase;
   final DeletePersonUseCase _deletePersonUseCase;
+  final GraphViewModel _graphViewModel;
 
   PeopleViewModel({
     required PersonRepository personRepository,
     required CreatePersonUseCase createPersonUseCase,
     required EditPersonUseCase editPersonUseCase,
     required DeletePersonUseCase deletePersonUseCase,
+    required GraphViewModel graphViewModel,
   }) : _personRepository = personRepository,
        _createPersonUseCase = createPersonUseCase,
        _editPersonUseCase = editPersonUseCase,
-       _deletePersonUseCase = deletePersonUseCase;
+       _deletePersonUseCase = deletePersonUseCase,
+       _graphViewModel = graphViewModel;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -40,6 +44,7 @@ class PeopleViewModel extends ChangeNotifier {
       _people = await _personRepository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _graphViewModel.merge(_people);
     } finally {
       _isLoading = false;
       notifyListeners();

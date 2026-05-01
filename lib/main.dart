@@ -14,6 +14,7 @@ import 'package:knowledge_graph/ui/features/todo/views/todo_list_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_lists_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_detail_view.dart';
 import 'package:knowledge_graph/ui/features/todo/views/task_form_view.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/layout/main_layout.dart';
 import 'package:knowledge_graph/data/repositories/person_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
@@ -83,6 +84,8 @@ void main() {
   );
 
   // 3. Initialize ViewModels (Singletons)
+  final graphViewModel = GraphViewModel();
+
   final taskListsViewModel = TaskListsViewModel(
     taskListRepository: taskListRepo,
     createTaskListUseCase: createTaskListUseCase,
@@ -105,6 +108,7 @@ void main() {
     createPersonUseCase: createPersonUseCase,
     editPersonUseCase: editPersonUseCase,
     deletePersonUseCase: deletePersonUseCase,
+    graphViewModel: graphViewModel,
   );
 
   final organizationsViewModel = OrganizationsViewModel(
@@ -112,6 +116,7 @@ void main() {
     createOrganizationUseCase: createOrganizationUseCase,
     editOrganizationUseCase: editOrganizationUseCase,
     deleteOrganizationUseCase: deleteOrganizationUseCase,
+    graphViewModel: graphViewModel,
   );
 
   // 4. Configure GoRouter
@@ -152,8 +157,7 @@ void main() {
                   final taskId = state.pathParameters['taskId']!;
                   return TaskDetailView(
                     viewModel: todoListViewModel,
-                    peopleViewModel: peopleViewModel,
-                    organizationsViewModel: organizationsViewModel,
+                    graphViewModel: graphViewModel,
                     listId: listId,
                     taskId: taskId,
                   );

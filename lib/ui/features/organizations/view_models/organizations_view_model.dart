@@ -4,6 +4,7 @@ import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
 import 'package:knowledge_graph/data/repositories/organization_repository.dart';
 import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 
 class OrganizationsViewModel extends ChangeNotifier {
   static final _log = Logger('OrganizationsViewModel');
@@ -12,16 +13,19 @@ class OrganizationsViewModel extends ChangeNotifier {
   final CreateOrganizationUseCase _createOrganizationUseCase;
   final EditOrganizationUseCase _editOrganizationUseCase;
   final DeleteOrganizationUseCase _deleteOrganizationUseCase;
+  final GraphViewModel _graphViewModel;
 
   OrganizationsViewModel({
     required OrganizationRepository organizationRepository,
     required CreateOrganizationUseCase createOrganizationUseCase,
     required EditOrganizationUseCase editOrganizationUseCase,
     required DeleteOrganizationUseCase deleteOrganizationUseCase,
+    required GraphViewModel graphViewModel,
   }) : _organizationRepository = organizationRepository,
        _createOrganizationUseCase = createOrganizationUseCase,
        _editOrganizationUseCase = editOrganizationUseCase,
-       _deleteOrganizationUseCase = deleteOrganizationUseCase;
+       _deleteOrganizationUseCase = deleteOrganizationUseCase,
+       _graphViewModel = graphViewModel;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -40,6 +44,7 @@ class OrganizationsViewModel extends ChangeNotifier {
       _organizations = await _organizationRepository.getItems(
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
+      _graphViewModel.merge(_organizations);
     } finally {
       _isLoading = false;
       notifyListeners();
