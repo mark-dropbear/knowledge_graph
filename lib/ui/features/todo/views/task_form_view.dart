@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
+import 'package:knowledge_graph/domain/models/thing_instance.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/multi_type_resource_selection_modal.dart';
@@ -30,6 +31,7 @@ class _TaskFormViewState extends State<TaskFormView> {
   late final TextEditingController _descriptionController;
   List<String> _selectedAgentIds = [];
   List<String> _selectedParticipantIds = [];
+  List<String> _selectedInstrumentIds = [];
   Task? _existingTask;
 
   @override
@@ -51,6 +53,7 @@ class _TaskFormViewState extends State<TaskFormView> {
     );
     _selectedAgentIds = List.from(_existingTask?.agent ?? []);
     _selectedParticipantIds = List.from(_existingTask?.participant ?? []);
+    _selectedInstrumentIds = List.from(_existingTask?.instrument ?? []);
   }
 
   @override
@@ -74,6 +77,7 @@ class _TaskFormViewState extends State<TaskFormView> {
         description: description.isEmpty ? null : description,
         agent: _selectedAgentIds,
         participant: _selectedParticipantIds,
+        instrument: _selectedInstrumentIds,
       );
     } else {
       await widget.viewModel.editTask(
@@ -82,6 +86,7 @@ class _TaskFormViewState extends State<TaskFormView> {
         newDescription: description.isEmpty ? null : description,
         newAgent: _selectedAgentIds,
         newParticipant: _selectedParticipantIds,
+        newInstrument: _selectedInstrumentIds,
       );
     }
 
@@ -170,6 +175,28 @@ class _TaskFormViewState extends State<TaskFormView> {
     );
   }
 
+  Future<void> _selectInstruments() async {
+    await MultiTypeResourceSelectionModal.show(
+      context: context,
+      title: 'Select Required Tools',
+      initialSelectedIds: _selectedInstrumentIds,
+      tabs: [
+        ResourceTab(
+          label: 'Things',
+          fetchItems: () async {
+            final things = widget.graphViewModel.getItems<ThingInstance>();
+            return Map.fromEntries(things.map((t) => MapEntry(t.id, t.name)));
+          },
+        ),
+      ],
+      onSelectionSaved: (selectedIds) {
+        setState(() {
+          _selectedInstrumentIds = selectedIds;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -230,6 +257,20 @@ class _TaskFormViewState extends State<TaskFormView> {
               trailing: FilledButton.tonal(
                 onPressed: _selectParticipants,
                 child: const Text('Edit Participants'),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Required Tools',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: Text('${_selectedInstrumentIds.length} tools selected'),
+              trailing: FilledButton.tonal(
+                onPressed: _selectInstruments,
+                child: const Text('Edit Tools'),
               ),
             ),
           ],

@@ -4,6 +4,7 @@ import 'package:data_layer/data_layer.dart';
 import 'package:knowledge_graph/domain/models/thing_instance.dart';
 import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/use_cases/thing_instance_use_cases.dart';
+import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 
 class ThingsViewModel extends ChangeNotifier {
   static final _log = Logger('ThingsViewModel');
@@ -12,16 +13,19 @@ class ThingsViewModel extends ChangeNotifier {
   final CreateThingInstanceUseCase _createThingInstanceUseCase;
   final EditThingInstanceUseCase _editThingInstanceUseCase;
   final DeleteThingInstanceUseCase _deleteThingInstanceUseCase;
+  final GraphViewModel _graphViewModel;
 
   ThingsViewModel({
     required Repository<Thing> repository,
     required CreateThingInstanceUseCase createThingInstanceUseCase,
     required EditThingInstanceUseCase editThingInstanceUseCase,
     required DeleteThingInstanceUseCase deleteThingInstanceUseCase,
+    required GraphViewModel graphViewModel,
   }) : _repository = repository,
        _createThingInstanceUseCase = createThingInstanceUseCase,
        _editThingInstanceUseCase = editThingInstanceUseCase,
-       _deleteThingInstanceUseCase = deleteThingInstanceUseCase;
+       _deleteThingInstanceUseCase = deleteThingInstanceUseCase,
+       _graphViewModel = graphViewModel;
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -41,6 +45,7 @@ class ThingsViewModel extends ChangeNotifier {
         details: RequestDetails.read(requestType: RequestType.allLocal),
       );
       _things = items.whereType<ThingInstance>().toList();
+      _graphViewModel.merge(_things);
     } finally {
       _isLoading = false;
       notifyListeners();

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/ui/features/things/view_models/things_view_model.dart';
-import 'package:knowledge_graph/domain/models/thing_instance.dart';
 
 class ThingsView extends StatefulWidget {
   final ThingsViewModel viewModel;

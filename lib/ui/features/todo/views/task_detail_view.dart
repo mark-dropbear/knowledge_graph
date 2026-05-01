@@ -7,6 +7,8 @@ import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_mode
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/shared/widgets/person_card.dart';
 import 'package:knowledge_graph/ui/shared/widgets/organization_card.dart';
+import 'package:knowledge_graph/domain/models/thing_instance.dart';
+import 'package:knowledge_graph/ui/shared/widgets/thing_card.dart';
 
 class TaskDetailView extends StatelessWidget {
   final TodoListViewModel viewModel;
@@ -60,6 +62,14 @@ class TaskDetailView extends StatelessWidget {
                   graphViewModel.resolve<Organization>(participantId),
             )
             .whereType<Organization>()
+            .toList();
+
+        final linkedInstruments = task.instrument
+            .map(
+              (instrumentId) =>
+                  graphViewModel.resolve<ThingInstance>(instrumentId),
+            )
+            .whereType<ThingInstance>()
             .toList();
 
         return Scaffold(
@@ -165,6 +175,24 @@ class TaskDetailView extends StatelessWidget {
                     organization: org,
                     onTap: () => context.push(
                       '/organizations/${Uri.encodeComponent(org.id)}',
+                    ),
+                  ),
+                ),
+              ],
+              if (linkedInstruments.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  'Required Tools',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ...linkedInstruments.map(
+                  (thing) => ThingCard(
+                    thing: thing,
+                    onTap: () => context.push(
+                      '/things/${Uri.encodeComponent(thing.id)}',
                     ),
                   ),
                 ),

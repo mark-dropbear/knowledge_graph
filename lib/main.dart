@@ -113,7 +113,15 @@ void main() {
     createThingInstanceUseCase: createThingInstanceUseCase,
     editThingInstanceUseCase: editThingInstanceUseCase,
     deleteThingInstanceUseCase: deleteThingInstanceUseCase,
+    graphViewModel: graphViewModel,
   );
+
+  // Initialize view models immediately so the unified graph is populated
+  // from the local data store when the app starts, before users navigate to
+  // specific tabs. This ensures modals and detail views have all data.
+  peopleViewModel.initialize();
+  organizationsViewModel.initialize();
+  thingsViewModel.initialize();
 
   // 4. Configure GoRouter
   final router = GoRouter(

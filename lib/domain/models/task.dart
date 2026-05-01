@@ -52,6 +52,7 @@ class Task implements Thing {
   final String? endTime;
   final List<String> agent;
   final List<String> participant;
+  final List<String> instrument;
 
   Task({
     required this.id,
@@ -61,8 +62,10 @@ class Task implements Thing {
     this.endTime,
     List<String>? agent,
     List<String>? participant,
+    List<String>? instrument,
   }) : agent = agent ?? [],
-       participant = participant ?? [];
+       participant = participant ?? [],
+       instrument = instrument ?? [];
 
   Task copyWith({
     String? id,
@@ -72,6 +75,7 @@ class Task implements Thing {
     String? endTime,
     List<String>? agent,
     List<String>? participant,
+    List<String>? instrument,
   }) {
     return Task(
       id: id ?? this.id,
@@ -81,6 +85,7 @@ class Task implements Thing {
       endTime: endTime ?? this.endTime,
       agent: agent ?? List.from(this.agent),
       participant: participant ?? List.from(this.participant),
+      instrument: instrument ?? List.from(this.instrument),
     );
   }
 
@@ -107,6 +112,17 @@ class Task implements Thing {
       }
     }
 
+    List<String> parsedInstrument = [];
+    if (json['instrument'] != null) {
+      if (json['instrument'] is List) {
+        parsedInstrument = (json['instrument'] as List)
+            .map((e) => (e as Map<String, dynamic>)['@id'] as String)
+            .toList();
+      } else if (json['instrument'] is Map) {
+        parsedInstrument = [json['instrument']['@id'] as String];
+      }
+    }
+
     return Task(
       id: json['@id'] as String,
       name: json['name'] as String,
@@ -115,6 +131,7 @@ class Task implements Thing {
       endTime: json['endTime'] as String?,
       agent: parsedAgent,
       participant: parsedParticipant,
+      instrument: parsedInstrument,
     );
   }
 
@@ -130,6 +147,8 @@ class Task implements Thing {
       if (agent.isNotEmpty) 'agent': agent.map((id) => {'@id': id}).toList(),
       if (participant.isNotEmpty)
         'participant': participant.map((id) => {'@id': id}).toList(),
+      if (instrument.isNotEmpty)
+        'instrument': instrument.map((id) => {'@id': id}).toList(),
     };
   }
 
