@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import 'ui/shared/theme.dart';
+
 class MainApp extends StatelessWidget {
   final GoRouter router;
 
@@ -8,9 +10,14 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    const theme = MaterialTheme(TextTheme());
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorSchemeSeed: Colors.blue, useMaterial3: true),
+      theme: theme.light(),
+      darkTheme: theme.dark(),
+      highContrastDarkTheme: theme.darkHighContrast(),
+      highContrastTheme: theme.lightHighContrast(),
+      themeMode: ThemeMode.system,
       routerConfig: router,
     );
   }
