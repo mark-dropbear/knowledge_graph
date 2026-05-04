@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widget_previews.dart';
 
 class ResourceTab {
   final String label;
@@ -181,65 +180,4 @@ class _MultiTypeResourceSelectionModalState
       ),
     );
   }
-}
-
-// -----------------------------------------------------------------------------
-// Previews
-// -----------------------------------------------------------------------------
-
-@Preview(name: 'Multi-Type Selection Modal', size: Size(400, 600))
-Widget multiTypeSelectionPreview() {
-  return Material(
-    child: MultiTypeResourceSelectionModal(
-      title: 'Select Assignees',
-      initialSelectedIds: const ['urn:uuid:p1', 'urn:uuid:o2'],
-      tabs: [
-        ResourceTab(
-          label: 'People',
-          fetchItems: () async => {
-            'urn:uuid:p1': 'Alice Smith',
-            'urn:uuid:p2': 'Bob Johnson',
-            'urn:uuid:p3': 'Charlie Brown',
-          },
-        ),
-        ResourceTab(
-          label: 'Organizations',
-          fetchItems: () async => {
-            'urn:uuid:o1': 'Acme Corp',
-            'urn:uuid:o2': 'Globex Inc',
-          },
-        ),
-      ],
-      onSelectionSaved: (ids) {
-        debugPrint('Saved IDs: $ids');
-      },
-    ),
-  );
-}
-
-@Preview(name: 'Multi-Type Selection Modal (Loading)', size: Size(400, 600))
-Widget multiTypeSelectionLoadingPreview() {
-  return Material(
-    child: MultiTypeResourceSelectionModal(
-      title: 'Select Assignees',
-      initialSelectedIds: const [],
-      tabs: [
-        ResourceTab(
-          label: 'People',
-          fetchItems: () async {
-            await Future.delayed(const Duration(seconds: 10));
-            return {};
-          },
-        ),
-        ResourceTab(
-          label: 'Organizations',
-          fetchItems: () async {
-            await Future.delayed(const Duration(seconds: 10));
-            return {};
-          },
-        ),
-      ],
-      onSelectionSaved: (_) {},
-    ),
-  );
 }
