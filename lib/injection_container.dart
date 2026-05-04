@@ -9,12 +9,14 @@ import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/thing_instance_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
+import 'package:knowledge_graph/domain/use_cases/creative_work_use_cases.dart';
 
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 import 'package:knowledge_graph/ui/features/things/view_models/things_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
+import 'package:knowledge_graph/ui/features/creative_works/view_models/creative_works_view_model.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
 import 'package:knowledge_graph/ui/features/home/view_models/home_view_model.dart';
 
@@ -46,6 +48,11 @@ void init() {
   sl.registerLazySingleton(() => CreateOrganizationUseCase(sl()));
   sl.registerLazySingleton(() => EditOrganizationUseCase(sl()));
   sl.registerLazySingleton(() => DeleteOrganizationUseCase(sl()));
+
+  // CreativeWork
+  sl.registerLazySingleton(() => CreateCreativeWorkUseCase(sl()));
+  sl.registerLazySingleton(() => EditCreativeWorkUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteCreativeWorkUseCase(sl()));
 
   // ThingInstance
   sl.registerLazySingleton(() => CreateThingInstanceUseCase(sl()));
@@ -91,6 +98,16 @@ void init() {
       createOrganizationUseCase: sl(),
       editOrganizationUseCase: sl(),
       deleteOrganizationUseCase: sl(),
+      graphViewModel: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => CreativeWorksViewModel(
+      repository: sl(),
+      createCreativeWorkUseCase: sl(),
+      editCreativeWorkUseCase: sl(),
+      deleteCreativeWorkUseCase: sl(),
       graphViewModel: sl(),
     ),
   );

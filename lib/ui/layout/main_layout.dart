@@ -18,6 +18,8 @@ class MainLayout extends StatelessWidget {
       return 3;
     } else if (location.startsWith('/things')) {
       return 4;
+    } else if (location.startsWith('/creative-works')) {
+      return 5;
     }
     return 0;
   }
@@ -40,6 +42,8 @@ class MainLayout extends StatelessWidget {
                 context.go('/organizations');
               } else if (index == 4) {
                 context.go('/things');
+              } else if (index == 5) {
+                context.go('/creative-works');
               }
             },
             labelType: NavigationRailLabelType.all,
@@ -68,6 +72,11 @@ class MainLayout extends StatelessWidget {
                 icon: Icon(Icons.category),
                 selectedIcon: Icon(Icons.category),
                 label: Text('Things'),
+              ),
+              NavigationRailDestination(
+                icon: Icon(Icons.book),
+                selectedIcon: Icon(Icons.book),
+                label: Text('Creative'),
               ),
             ],
           ),

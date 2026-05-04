@@ -55,6 +55,13 @@ class HomeView extends StatelessWidget {
                 ),
                 _buildBrowseCard(
                   context,
+                  title: 'Creative Works',
+                  icon: Icons.book,
+                  route: '/creative-works',
+                  color: Colors.redAccent,
+                ),
+                _buildBrowseCard(
+                  context,
                   title: 'Things',
                   icon: Icons.category,
                   route: '/things',

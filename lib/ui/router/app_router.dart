@@ -22,6 +22,11 @@ import 'package:knowledge_graph/ui/features/people/views/person_detail_view.dart
 import 'package:knowledge_graph/ui/features/organizations/views/organization_form_view.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organization_detail_view.dart';
 
+import 'package:knowledge_graph/ui/features/creative_works/view_models/creative_works_view_model.dart';
+import 'package:knowledge_graph/ui/features/creative_works/views/creative_works_view.dart';
+import 'package:knowledge_graph/ui/features/creative_works/views/creative_work_form_view.dart';
+import 'package:knowledge_graph/ui/features/creative_works/views/creative_work_detail_view.dart';
+
 import 'package:knowledge_graph/ui/features/things/view_models/things_view_model.dart';
 import 'package:knowledge_graph/ui/features/things/views/things_view.dart';
 import 'package:knowledge_graph/ui/features/things/views/thing_form_view.dart';
@@ -163,6 +168,44 @@ final appRouter = GoRouter(
                       viewModel: di.sl<OrganizationsViewModel>(),
                       graphViewModel: di.sl<GraphViewModel>(),
                       organizationId: id,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/creative-works',
+          builder: (context, state) =>
+              CreativeWorksView(viewModel: di.sl<CreativeWorksViewModel>()),
+          routes: [
+            GoRoute(
+              path: 'create',
+              builder: (context, state) => CreativeWorkFormView(
+                viewModel: di.sl<CreativeWorksViewModel>(),
+                graphViewModel: di.sl<GraphViewModel>(),
+              ),
+            ),
+            GoRoute(
+              path: ':id',
+              builder: (context, state) {
+                final id = state.pathParameters['id']!;
+                return CreativeWorkDetailView(
+                  viewModel: di.sl<CreativeWorksViewModel>(),
+                  graphViewModel: di.sl<GraphViewModel>(),
+                  creativeWorkId: id,
+                );
+              },
+              routes: [
+                GoRoute(
+                  path: 'edit',
+                  builder: (context, state) {
+                    final id = state.pathParameters['id']!;
+                    return CreativeWorkFormView(
+                      viewModel: di.sl<CreativeWorksViewModel>(),
+                      graphViewModel: di.sl<GraphViewModel>(),
+                      creativeWorkId: id,
                     );
                   },
                 ),

@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/models/person.dart';
 import 'package:knowledge_graph/domain/models/organization.dart';
+import 'package:knowledge_graph/domain/models/creative_work.dart';
 import 'package:knowledge_graph/domain/models/task.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/thing_instance.dart';
@@ -26,6 +27,13 @@ class GraphRepository extends Repository<Thing> {
       case 'NGO':
       case 'LocalBusiness':
         return Organization.fromJson(json);
+      case 'CreativeWork':
+      case 'WebSite':
+      case 'WebPage':
+      case 'WebPageElement':
+      case 'Book':
+      case 'Article':
+        return CreativeWork.fromJson(json);
       case 'Action':
         return Task.fromJson(json);
       case 'ItemList':
@@ -42,6 +50,7 @@ class GraphRepository extends Repository<Thing> {
     toJson: (thing) {
       if (thing is Person) return thing.toJson();
       if (thing is Organization) return thing.toJson();
+      if (thing is CreativeWork) return thing.toJson();
       if (thing is Task) return thing.toJson();
       if (thing is TaskList) return thing.toJson();
       if (thing is ThingInstance) return thing.toJson();
@@ -54,6 +63,7 @@ class GraphRepository extends Repository<Thing> {
 
       if (thing is Person) return thing.copyWith(id: newId);
       if (thing is Organization) return thing.copyWith(id: newId);
+      if (thing is CreativeWork) return thing.copyWith(id: newId);
       if (thing is Task) return thing.copyWith(id: newId);
       if (thing is TaskList) return thing.copyWith(id: newId);
       if (thing is ThingInstance) return thing.copyWith(id: newId);
