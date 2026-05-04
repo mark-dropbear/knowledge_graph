@@ -4,6 +4,7 @@ import 'package:knowledge_graph/data/repositories/graph_repository.dart';
 import 'package:knowledge_graph/domain/models/thing.dart';
 
 import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
+import 'package:knowledge_graph/domain/use_cases/import_dataset_use_case.dart';
 import 'package:knowledge_graph/domain/use_cases/organization_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/person_use_cases.dart';
 import 'package:knowledge_graph/domain/use_cases/thing_instance_use_cases.dart';
@@ -34,6 +35,7 @@ void init() {
   sl.registerLazySingleton(() => DeleteTaskListUseCase(sl()));
   sl.registerLazySingleton(() => EditTaskListUseCase(sl()));
   sl.registerLazySingleton(() => ExportDatasetUseCase(sl()));
+  sl.registerLazySingleton(() => ImportDatasetUseCase(sl()));
 
   // Person
   sl.registerLazySingleton(() => CreatePersonUseCase(sl()));
@@ -106,6 +108,7 @@ void init() {
   sl.registerLazySingleton(
     () => HomeViewModel(
       exportDatasetUseCase: sl(),
+      importDatasetUseCase: sl(),
     ),
   );
 }

@@ -87,6 +87,47 @@ class HomeView extends StatelessWidget {
                 }
               },
             ),
+            ListTile(
+              leading: const CircleAvatar(
+                child: Icon(Icons.upload),
+              ),
+              title: const Text('Import Knowledge Graph'),
+              subtitle: const Text('Import JSON-LD data from clipboard'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
+                final jsonLd = clipboardData?.text;
+                if (jsonLd == null || jsonLd.isEmpty) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Clipboard is empty'),
+                      ),
+                    );
+                  }
+                  return;
+                }
+                
+                try {
+                  await viewModel.importJsonLd(jsonLd);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Successfully imported dataset!'),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Failed to import: $e'),
+                      ),
+                    );
+                  }
+                }
+              },
+            ),
           ],
         ),
       ),

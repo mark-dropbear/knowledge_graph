@@ -16,24 +16,29 @@ class GraphRepository extends Repository<Thing> {
         ),
       );
 
+  static Thing fromJson(Map<String, dynamic> json) {
+    final type = json['@type'];
+    switch (type) {
+      case 'Person':
+        return Person.fromJson(json);
+      case 'Organization':
+      case 'Corporation':
+      case 'NGO':
+      case 'LocalBusiness':
+        return Organization.fromJson(json);
+      case 'Action':
+        return Task.fromJson(json);
+      case 'ItemList':
+        return TaskList.fromJson(json);
+      case 'Thing':
+        return ThingInstance.fromJson(json);
+      default:
+        throw Exception('GraphRepository: Unknown type: $type');
+    }
+  }
+
   static final CreationBindings<Thing> _bindings = CreationBindings<Thing>(
-    fromJson: (json) {
-      final type = json['@type'];
-      switch (type) {
-        case 'Person':
-          return Person.fromJson(json);
-        case 'Organization':
-          return Organization.fromJson(json);
-        case 'Action':
-          return Task.fromJson(json);
-        case 'ItemList':
-          return TaskList.fromJson(json);
-        case 'Thing':
-          return ThingInstance.fromJson(json);
-        default:
-          throw Exception('GraphRepository: Unknown type: $type');
-      }
-    },
+    fromJson: fromJson,
     toJson: (thing) {
       if (thing is Person) return thing.toJson();
       if (thing is Organization) return thing.toJson();
