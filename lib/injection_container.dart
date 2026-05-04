@@ -15,6 +15,7 @@ import 'package:knowledge_graph/ui/features/things/view_models/things_view_model
 import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/todo_list_view_model.dart';
 import 'package:knowledge_graph/ui/shared/view_models/graph_view_model.dart';
+import 'package:knowledge_graph/ui/features/home/view_models/home_view_model.dart';
 
 final sl = GetIt.instance;
 
@@ -58,7 +59,6 @@ void init() {
       createTaskListUseCase: sl(),
       deleteTaskListUseCase: sl(),
       editTaskListUseCase: sl(),
-      exportDatasetUseCase: sl(),
     ),
   );
 
@@ -100,6 +100,12 @@ void init() {
       editThingInstanceUseCase: sl(),
       deleteThingInstanceUseCase: sl(),
       graphViewModel: sl(),
+    ),
+  );
+
+  sl.registerLazySingleton(
+    () => HomeViewModel(
+      exportDatasetUseCase: sl(),
     ),
   );
 }

@@ -8,12 +8,16 @@ class MainLayout extends StatelessWidget {
 
   int _calculateSelectedIndex(BuildContext context) {
     final String location = GoRouterState.of(context).uri.path;
-    if (location.startsWith('/people')) {
+    if (location == '/') {
+      return 0;
+    } else if (location.startsWith('/tasks') || location.startsWith('/lists')) {
       return 1;
-    } else if (location.startsWith('/organizations')) {
+    } else if (location.startsWith('/people')) {
       return 2;
-    } else if (location.startsWith('/things')) {
+    } else if (location.startsWith('/organizations')) {
       return 3;
+    } else if (location.startsWith('/things')) {
+      return 4;
     }
     return 0;
   }
@@ -29,15 +33,22 @@ class MainLayout extends StatelessWidget {
               if (index == 0) {
                 context.go('/');
               } else if (index == 1) {
-                context.go('/people');
+                context.go('/tasks');
               } else if (index == 2) {
-                context.go('/organizations');
+                context.go('/people');
               } else if (index == 3) {
+                context.go('/organizations');
+              } else if (index == 4) {
                 context.go('/things');
               }
             },
             labelType: NavigationRailLabelType.all,
             destinations: const [
+              NavigationRailDestination(
+                icon: Icon(Icons.home),
+                selectedIcon: Icon(Icons.home),
+                label: Text('Home'),
+              ),
               NavigationRailDestination(
                 icon: Icon(Icons.task),
                 selectedIcon: Icon(Icons.task),

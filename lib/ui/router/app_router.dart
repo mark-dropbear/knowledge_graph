@@ -12,6 +12,8 @@ import 'package:knowledge_graph/ui/layout/main_layout.dart';
 
 import 'package:knowledge_graph/ui/features/people/view_models/people_view_model.dart';
 import 'package:knowledge_graph/ui/features/people/views/people_view.dart';
+import 'package:knowledge_graph/ui/features/home/views/home_view.dart';
+import 'package:knowledge_graph/ui/features/home/view_models/home_view_model.dart';
 
 import 'package:knowledge_graph/ui/features/organizations/view_models/organizations_view_model.dart';
 import 'package:knowledge_graph/ui/features/organizations/views/organizations_view.dart';
@@ -33,6 +35,11 @@ final appRouter = GoRouter(
       routes: [
         GoRoute(
           path: '/',
+          builder: (context, state) =>
+              HomeView(viewModel: di.sl<HomeViewModel>()),
+        ),
+        GoRoute(
+          path: '/tasks',
           builder: (context, state) =>
               TaskListsView(viewModel: di.sl<TaskListsViewModel>()),
         ),

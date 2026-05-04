@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:knowledge_graph/ui/features/todo/view_models/task_lists_view_model.dart';
 import 'package:knowledge_graph/domain/models/task_list.dart';
@@ -174,23 +173,7 @@ class _TaskListsViewState extends State<TaskListsView> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('My Task Lists'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.copy),
-                tooltip: 'Export JSON-LD',
-                onPressed: () async {
-                  final jsonString = await widget.viewModel.exportJsonLd();
-                  Clipboard.setData(ClipboardData(text: jsonString));
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('JSON-LD copied to clipboard'),
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
+
           ),
           body: widget.viewModel.isLoading && widget.viewModel.lists.isEmpty
               ? const Center(child: CircularProgressIndicator())

@@ -4,7 +4,7 @@ import 'package:knowledge_graph/domain/models/task_list.dart';
 import 'package:knowledge_graph/domain/models/thing.dart';
 import 'package:knowledge_graph/domain/use_cases/todo_use_cases.dart';
 import 'package:data_layer/data_layer.dart';
-import 'package:knowledge_graph/domain/use_cases/export_dataset_use_case.dart';
+
 
 class TaskListsViewModel extends ChangeNotifier {
   static final _log = Logger('TaskListsViewModel');
@@ -13,19 +13,19 @@ class TaskListsViewModel extends ChangeNotifier {
   final CreateTaskListUseCase _createTaskListUseCase;
   final DeleteTaskListUseCase _deleteTaskListUseCase;
   final EditTaskListUseCase _editTaskListUseCase;
-  final ExportDatasetUseCase _exportDatasetUseCase;
+
 
   TaskListsViewModel({
     required Repository<Thing> repository,
     required CreateTaskListUseCase createTaskListUseCase,
     required DeleteTaskListUseCase deleteTaskListUseCase,
     required EditTaskListUseCase editTaskListUseCase,
-    required ExportDatasetUseCase exportDatasetUseCase,
+
   }) : _repository = repository,
        _createTaskListUseCase = createTaskListUseCase,
        _deleteTaskListUseCase = deleteTaskListUseCase,
-       _editTaskListUseCase = editTaskListUseCase,
-       _exportDatasetUseCase = exportDatasetUseCase;
+       _editTaskListUseCase = editTaskListUseCase;
+
 
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -114,8 +114,4 @@ class TaskListsViewModel extends ChangeNotifier {
     }
   }
 
-  Future<String> exportJsonLd() async {
-    _log.info('Exporting dataset');
-    return await _exportDatasetUseCase.execute();
-  }
 }
