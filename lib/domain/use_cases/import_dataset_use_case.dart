@@ -21,15 +21,19 @@ class ImportDatasetUseCase {
         return;
       }
 
+      final things = <Thing>[];
       for (final item in graph) {
         if (item is Map<String, dynamic>) {
           try {
             final thing = GraphRepository.fromJson(item);
-            await _repository.setItem(thing);
+            things.add(thing);
           } catch (e) {
             _log.warning('Skipped item due to parsing error: $e');
           }
         }
+      }
+      if (things.isNotEmpty) {
+        await _repository.setItems(things);
       }
     } catch (e, st) {
       _log.severe('Failed to import dataset', e, st);

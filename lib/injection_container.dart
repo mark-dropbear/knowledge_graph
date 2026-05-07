@@ -126,6 +126,8 @@ void init() {
     () => HomeViewModel(
       exportDatasetUseCase: sl(),
       importDatasetUseCase: sl(),
+      graphViewModel: sl(),
+      repository: sl(),
     ),
   );
 }
